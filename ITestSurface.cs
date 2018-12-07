@@ -17,17 +17,17 @@ namespace TestRunner
 		bool RequireArgs { get; }
 
 		/// <summary>
+		/// Description of the test and the arguments.
+		/// </summary>
+		/// <returns>The info text.</returns>
+		string Info { get; }
+
+		/// <summary>
 		/// A task which may or may not be started.
 		/// The runner will Wait() for each task.
 		/// </summary>
 		/// <param name="args">The parsed arguments as a dictionary where keys are the switches.</param>
 		/// <returns>A task to be awaited.</returns>
 		Task Run(ArgMap args);
-
-		/// <summary>
-		/// Description of the test and the arguments.
-		/// </summary>
-		/// <returns>The info text.</returns>
-		string Info();
 	}
 }

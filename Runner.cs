@@ -44,7 +44,7 @@ namespace TestRunner
 							if (argsMap.ContainsKey("-info"))
 							{
 								Print.AsTestHeader(string.Format("{0}:", st.Name));
-								Print.AsHelp(test.Info());
+								Print.AsHelp(test.Info);
 								Console.WriteLine();
 							}
 							else
@@ -68,7 +68,7 @@ namespace TestRunner
 					if (test != null)
 					{
 						Print.AsSystemTrace("The test info:");
-						Print.AsHelp(test.Info());
+						Print.AsHelp(test.Info);
 					}
 				}
 				catch (Exception ex)
