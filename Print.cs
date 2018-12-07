@@ -9,7 +9,7 @@ namespace TestRunner
 		public static void AsHelp(this string text, params object[] formatArgs) =>
 			Trace(text, ConsoleColor.DarkCyan, null, formatArgs);
 
-		public static void AsSysyemTrace(this string text, params object[] formatArgs) =>
+		public static void AsSystemTrace(this string text, params object[] formatArgs) =>
 			Trace(text, ConsoleColor.White, ConsoleColor.DarkBlue, formatArgs);
 
 		public static void AsTestSuccess(this string text, params object[] formatArgs) =>
@@ -20,6 +20,10 @@ namespace TestRunner
 
 		public static void AsTestUnknown(this string text, params object[] formatArgs) =>
 			Trace(text, ConsoleColor.White, ConsoleColor.DarkMagenta, formatArgs);
+
+		public static void AsTestHeader(this string text, params object[] formatArgs) =>
+			Trace(text, ConsoleColor.Black, ConsoleColor.White, formatArgs);
+
 
 		public static void AsInfo(this string text, params object[] formatArgs)
 		{

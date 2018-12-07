@@ -6,12 +6,16 @@ namespace TestRunner
 {
 	public class Runner
 	{
-		public void Run(string[] args)
+		public void Run(string testLibName, string[] args)
 		{
-			Print.AsWarn("This is the MemoryLanes test runner.");
-			Print.AsWarn("To run all tests use the -all switch; for specific surface class -ITestSurface_ClassName");
-			Print.AsWarn("To suppress info tracing add -notrace");
-			Print.AsWarn("For help pass the -info argument along with either -all or -YourTestClass");
+			Print.AsSystemTrace("| ======================================");
+			Print.AsSystemTrace("| Test runner for {0}:", testLibName);
+			Print.AsSystemTrace("| To run all tests use the -all switch; for specific surface class -ITestSurface_ClassName");
+			Print.AsSystemTrace("| To suppress info tracing add -notrace");
+			Print.AsSystemTrace("| For help pass the -info argument along with either -all or -YourTestClass");
+			Print.AsSystemTrace("| ======================================");
+
+			Console.WriteLine();
 
 			var argsMap = new ArgsParser(args).Map;
 			var SurfaceTypes = AppDomain.CurrentDomain.GetAssemblies()
@@ -23,6 +27,12 @@ namespace TestRunner
 
 			ITestSurface test = null;
 
+			if (SurfaceTypes.Count > 0)
+			{
+				Print.AsSystemTrace("There are {0} tests in the queue", SurfaceTypes.Count);
+				Print.AsSystemTrace("Starting..." + Environment.NewLine);
+			}
+
 			foreach (var st in SurfaceTypes)
 				try
 				{
@@ -33,13 +43,13 @@ namespace TestRunner
 						{
 							if (argsMap.ContainsKey("-info"))
 							{
-								Print.AsSysyemTrace(string.Format("{0}:", st.Name));
+								Print.AsTestHeader(string.Format("{0}:", st.Name));
 								Print.AsHelp(test.Info());
 								Console.WriteLine();
 							}
 							else
 							{
-								Print.AsSysyemTrace(string.Format("{0}:", st.Name));
+								Print.AsTestHeader(string.Format("{0}:", st.Name));
 								test.Run(argsMap).Wait();
 								if (test.Passed.HasValue)
 								{
@@ -57,7 +67,7 @@ namespace TestRunner
 					Print.AsError(kex.Message);
 					if (test != null)
 					{
-						Print.AsSysyemTrace("The test info:");
+						Print.AsSystemTrace("The test info:");
 						Print.AsHelp(test.Info());
 					}
 				}
