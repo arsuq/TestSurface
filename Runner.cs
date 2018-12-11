@@ -25,22 +25,22 @@ namespace TestRunner
 
 			if (argsMap.ContainsKey("-notrace")) Print.IgnoreInfo = true;
 
-			ITestSurface test = null;
+			Print.AsSystemTrace("There are {0} tests available", SurfaceTypes.Count);
+			Console.WriteLine();
 
-			if (SurfaceTypes.Count > 0)
-			{
-				Print.AsSystemTrace("There are {0} tests in the queue", SurfaceTypes.Count);
-				Print.AsSystemTrace("Starting..." + Environment.NewLine);
-			}
+			ITestSurface test = null;
 
 			foreach (var st in SurfaceTypes)
 				try
 				{
-					if (argsMap.ContainsKey("-all") || argsMap.ContainsKey(string.Format("-{0}", st.Name)))
+					var runAll = argsMap.ContainsKey("-all");
+					if (runAll || argsMap.ContainsKey(string.Format("-{0}", st.Name)))
 					{
 						test = Activator.CreateInstance(st) as ITestSurface;
-						if (test != null && !test.RequireArgs)
+						if (test != null)
 						{
+							if (runAll && test.RequireArgs) continue;
+
 							if (argsMap.ContainsKey("-info"))
 							{
 								Print.AsTestHeader(string.Format("{0}:", st.Name));
@@ -50,7 +50,13 @@ namespace TestRunner
 							else
 							{
 								Print.AsTestHeader(string.Format("{0}:", st.Name));
-								test.Run(argsMap).Wait();
+
+								// Copy because each test may add switches to reuse functionality.
+								// For example if -all the Run will add default flags, which should
+								// be private for that specific test only.
+								var argsMapCopy = new Dictionary<string, List<string>>(argsMap);
+
+								test.Run(argsMapCopy).Wait();
 								if (test.Passed.HasValue)
 								{
 									if (test.Passed.Value) Print.AsTestSuccess(string.Format("OK: {0}", st.Name));

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace TestRunner
 {
@@ -56,6 +57,9 @@ namespace TestRunner
 		{
 			if (IgnoreAll) return;
 
+			bool locked = false;
+			spinLock.Enter(ref locked);
+
 			var cc = Console.ForegroundColor;
 			var bc = Console.BackgroundColor;
 			Console.ForegroundColor = c;
@@ -63,11 +67,12 @@ namespace TestRunner
 			Console.WriteLine(text, formatArgs);
 			Console.ForegroundColor = cc;
 			Console.BackgroundColor = bc;
-		}
 
+			if (locked) spinLock.Exit();
+		}
 
 		public static bool IgnoreAll = false;
 		public static bool IgnoreInfo = false;
-
+		static SpinLock spinLock = new SpinLock();
 	}
 }
