@@ -82,10 +82,7 @@ namespace TestRunner
 								}
 							}
 						}
-						else
-						{
-							Print.AsTestFailure(string.Format("Failed to activate: {0}", st.Name));
-						}
+						else Print.AsTestFailure(string.Format("Failed to activate: {0}", st.Name));
 					}
 				}
 				catch (KeyNotFoundException kex)
