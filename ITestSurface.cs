@@ -30,7 +30,7 @@ namespace TestRunner
 
 		/// <summary>
 		/// Some tests have no default initial values or require multiple instances
-		/// of the test app to be running at the sane time such as the SocketLoad client-server test.
+		/// of the test app to be running at the sane time.
 		/// </summary>
 		bool RequireArgs { get; }
 		

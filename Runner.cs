@@ -29,6 +29,7 @@ namespace TestRunner
 			Console.WriteLine();
 
 			ITestSurface test = null;
+			int passed = 0, failed = 0, requireargs = 0, unknowns = 0;
 
 			foreach (var st in SurfaceTypes)
 				try
@@ -39,7 +40,11 @@ namespace TestRunner
 						test = Activator.CreateInstance(st) as ITestSurface;
 						if (test != null)
 						{
-							if (runAll && test.RequireArgs) continue;
+							if (runAll && test.RequireArgs)
+							{
+								requireargs++;
+								continue;
+							}
 
 							if (argsMap.ContainsKey("-info"))
 							{
@@ -59,11 +64,27 @@ namespace TestRunner
 								test.Run(argsMapCopy).Wait();
 								if (test.Passed.HasValue)
 								{
-									if (test.Passed.Value) Print.AsTestSuccess(string.Format("OK: {0}", st.Name));
-									else Print.AsTestFailure(string.Format("FAIL: {0} Ex: {1}", st.Name, test.FailureMessage));
+									if (test.Passed.Value)
+									{
+										passed++;
+										Print.AsTestSuccess(string.Format("OK: {0}", st.Name));
+									}
+									else
+									{
+										failed++;
+										Print.AsTestFailure(string.Format("FAIL: {0} Ex: {1}", st.Name, test.FailureMessage));
+									}
 								}
-								else Print.AsTestUnknown(string.Format("UNKNOWN: {0} ", st.Name));
+								else
+								{
+									unknowns++;
+									Print.AsTestUnknown(string.Format("UNKNOWN: {0} ", st.Name));
+								}
 							}
+						}
+						else
+						{
+							Print.AsTestFailure(string.Format("Failed to activate: {0}", st.Name));
 						}
 					}
 				}
@@ -81,6 +102,17 @@ namespace TestRunner
 				{
 					Print.AsError(ex.ToString());
 				}
+
+			var lines = FormatText.JoinLines(
+				"Results:",
+				"  Total tests: " + SurfaceTypes.Count,
+				"  Passed: " + passed,
+				"  Failed: " + failed,
+				"  Unknown: " + unknowns,
+				"  Skipped (require args): " + requireargs
+				);
+
+			Print.Trace(lines, ConsoleColor.White, ConsoleColor.DarkBlue, SurfaceTypes.Count, passed, failed, unknowns, requireargs);
 		}
 	}
 }
