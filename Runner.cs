@@ -54,31 +54,34 @@ namespace TestRunner
 							}
 							else
 							{
+								Console.WriteLine();
 								Print.AsTestHeader(string.Format("{0}:", st.Name));
 
 								// Copy because each test may add switches to reuse functionality.
 								// For example if -all the Run will add default flags, which should
 								// be private for that specific test only.
 								var argsMapCopy = new Dictionary<string, List<string>>(argsMap);
-
+								var started = DateTime.Now;
 								test.Run(argsMapCopy).Wait();
+								var dur = DateTime.Now.Subtract(started);
+								var duratoin = string.Format("[{0}m {1}s {2}ms]", dur.Minutes, dur.Seconds, dur.Milliseconds);
 								if (test.Passed.HasValue)
 								{
 									if (test.Passed.Value)
 									{
 										passed++;
-										Print.AsTestSuccess(string.Format("OK: {0}", st.Name));
+										Print.AsTestSuccess(string.Format("OK: {0} {1}", st.Name, duratoin));
 									}
 									else
 									{
 										failed++;
-										Print.AsTestFailure(string.Format("FAIL: {0} Ex: {1}", st.Name, test.FailureMessage));
+										Print.AsTestFailure(string.Format("FAIL: {0} {1} Ex: {2}", st.Name, duratoin, test.FailureMessage));
 									}
 								}
 								else
 								{
 									unknowns++;
-									Print.AsTestUnknown(string.Format("UNKNOWN: {0} ", st.Name));
+									Print.AsTestUnknown(string.Format("UNKNOWN: {0} {1}", st.Name, duratoin));
 								}
 							}
 						}

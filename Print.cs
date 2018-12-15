@@ -30,7 +30,7 @@ namespace TestRunner
 		{
 			if (IgnoreAll || IgnoreInfo) return;
 
-			Console.WriteLine("  " + text, formatArgs);
+			Console.WriteLine(text, formatArgs);
 		}
 
 		public static void AsSuccess(this string text, params object[] formatArgs)
