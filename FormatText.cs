@@ -10,12 +10,14 @@ namespace TestRunner
 		public static string JoinLines(int leftSpaces, params string[] lines)
 		{
 			var sb = new StringBuilder();
-			var lp = new char[leftSpaces];
+			var pad = string.Empty;
 
-			for (int i = 0; i < lp.Length; i++)
-				lp[i] = ' ';
-
-			var pad = new string(lp);
+			if (leftSpaces > 0)
+			{
+				var lp = new char[leftSpaces];
+				for (int k = 0; k < lp.Length; k++) lp[k] = ' ';
+				pad = new string(lp);
+			}
 
 			foreach (var l in lines)
 				sb.AppendLine(pad + l);
