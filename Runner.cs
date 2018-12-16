@@ -29,7 +29,7 @@ namespace TestRunner
 			Console.WriteLine();
 
 			ITestSurface test = null;
-			int passed = 0, failed = 0, requireargs = 0, unknowns = 0;
+			int passed = 0, failed = 0, requireargs = 0, unknowns = 0, launched = 0;
 
 			foreach (var st in SurfaceTypes)
 				try
@@ -65,6 +65,7 @@ namespace TestRunner
 								test.Run(argsMapCopy).Wait();
 								var dur = DateTime.Now.Subtract(started);
 								var duratoin = string.Format("[{0}m {1}s {2}ms]", dur.Minutes, dur.Seconds, dur.Milliseconds);
+								launched++;
 								if (test.Passed.HasValue)
 								{
 									if (test.Passed.Value)
@@ -106,6 +107,7 @@ namespace TestRunner
 			var lines = FormatText.JoinLines(
 				"Results:",
 				"  Total tests: " + SurfaceTypes.Count,
+				"  Launched: " + launched,
 				"  Passed: " + passed,
 				"  Failed: " + failed,
 				"  Unknown: " + unknowns,
