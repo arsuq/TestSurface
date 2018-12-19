@@ -115,6 +115,11 @@ namespace TestRunner
 				);
 
 			Print.Trace(lines, ConsoleColor.White, ConsoleColor.DarkBlue, SurfaceTypes.Count, passed, failed, unknowns, requireargs);
+
+			if (launched < 1)
+				Print.Trace("Did you forget specifying a test target? Add -all or -TestSurface as an argument.",
+					ConsoleColor.Red, ConsoleColor.Black);
+
 		}
 	}
 }
