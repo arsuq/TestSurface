@@ -32,7 +32,7 @@ namespace TestRunner
 		/// Some tests have no default initial values or require multiple instances
 		/// of the test app to be running at the sane time.
 		/// </summary>
-		bool RequireArgs { get; }
+		bool RequiresArgs { get; }
 		
 		/// <summary>
 		/// A task which may or may not be started.

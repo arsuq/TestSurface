@@ -16,6 +16,9 @@ namespace TestRunner
 		public static void AsTestSuccess(this string text, params object[] formatArgs) =>
 			Trace(text, ConsoleColor.White, ConsoleColor.DarkGreen, formatArgs);
 
+		public static void AsTestInfo(this string text, params object[] formatArgs) =>
+			Trace(text, ConsoleColor.Yellow, null, formatArgs);
+
 		public static void AsTestFailure(this string text, params object[] formatArgs) =>
 			Trace(text, ConsoleColor.White, ConsoleColor.DarkRed, formatArgs);
 
@@ -53,7 +56,7 @@ namespace TestRunner
 		public static void AsWarn(this string text, params object[] formatArgs) =>
 			Trace(text, ConsoleColor.Yellow, null, formatArgs);
 
-		public static void Trace(this string text, ConsoleColor c, ConsoleColor? bg, params object[] formatArgs)
+		public static void Trace(this string text, ConsoleColor c, ConsoleColor? bg = null, params object[] formatArgs)
 		{
 			if (IgnoreAll) return;
 

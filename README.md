@@ -14,7 +14,7 @@ public interface ITestSurface
 	string FailureMessage { get; }
 	bool? Passed { get; }
 	bool IsComplete { get; }
-	bool RequireArgs { get; }
+	bool RequiresArgs { get; }
 	Task Run(ArgMap args);
 }
 ``` 
@@ -23,7 +23,7 @@ The runner can be launched in two modes:
 
 - with a specific test class and arguments, by passing a **-TheTestClassName** as a command line parameter
 - the **-all** will discover all the compatible classes and invoke their Run method;
-  classes having RequireArgs = true will be ignored in this mode as they cannot be fed with specific
+  classes having RequiresArgs = true will be ignored in this mode as they cannot be fed with specific
   data because that may brake the rest of the tests. 
 
 The ArgMap type is in fact an IDictionary<string, List<string>> instance, produced by the ArgsParser. 

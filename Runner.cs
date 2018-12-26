@@ -12,6 +12,7 @@ namespace TestRunner
 			Print.AsSystemTrace("| Test runner for {0}:", testLibName);
 			Print.AsSystemTrace("| To run all tests use the -all switch; for specific surface class -ITestSurface_ClassName");
 			Print.AsSystemTrace("| To suppress info tracing add -notrace");
+			Print.AsSystemTrace("| To stop on first failure add -break");
 			Print.AsSystemTrace("| For help pass the -info argument along with either -all or -YourTestClass");
 			Print.AsSystemTrace("| ======================================");
 
@@ -35,12 +36,14 @@ namespace TestRunner
 				try
 				{
 					var runAll = argsMap.ContainsKey("-all");
+					var breakOnFirstFailure = argsMap.ContainsKey("-break");
+
 					if (runAll || argsMap.ContainsKey(string.Format("-{0}", st.Name)))
 					{
 						test = Activator.CreateInstance(st) as ITestSurface;
 						if (test != null)
 						{
-							if (runAll && test.RequireArgs)
+							if (runAll && test.RequiresArgs)
 							{
 								requireargs++;
 								continue;
@@ -77,6 +80,7 @@ namespace TestRunner
 									{
 										failed++;
 										Print.AsTestFailure(string.Format("FAIL: {0} {1} Ex: {2}", st.Name, duratoin, test.FailureMessage));
+										if (breakOnFirstFailure) break;
 									}
 								}
 								else
