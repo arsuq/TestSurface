@@ -46,24 +46,36 @@ namespace TestRunner
 					throw new ArgumentException(sw);
 		}
 
-		public static void AssertAtLeastOneArg(this List<string> args, params string[] possibleValues)
+		public static void AssertAtLeastOne(this List<string> args, params string[] possibleValues)
 		{
 			if (args == null) throw new ArgumentNullException("args");
 			if (possibleValues == null) throw new ArgumentNullException("possibleValues");
 
 			foreach (var v in possibleValues)
-				if (!args.Exists((e) => e == v))
-					throw new ArgumentException(v);
+				foreach (var a in args)
+					if (a == v) return;
+
+			throw new ArgumentException();
 		}
 
-		public static void AssertNothingButTheseArgs(this List<string> args, params string[] possibleValues)
+		public static void AssertNothingOutsideThese(this List<string> args, params string[] possibleValues)
 		{
 			if (args == null) throw new ArgumentNullException("args");
 			if (possibleValues == null) throw new ArgumentNullException("possibleValues");
 
-			foreach (var v in possibleValues)
-				if (!Array.Exists(possibleValues, (e) => e == v))
-					throw new ArgumentException(v);
+			foreach (var a in args)
+			{
+				var match = false;
+
+				foreach (var v in possibleValues)
+					if (a == v)
+					{
+						match = true;
+						break;
+					};
+
+				if (!match) throw new ArgumentException();
+			}
 		}
 	}
 }

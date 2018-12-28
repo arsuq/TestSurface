@@ -46,5 +46,32 @@ Launching with -all -info will trace all test descriptions.
 Use **Print** to trace info during the test instead of Console directly for it can be suppressed
 with -notrace and also the Print.Trace() method has a lock for correct coloring in multi-threaded code. 
 
+<br>
 
+ 
+## Usage
+
+Add a reference to the TestRunner.dll and launch a new Runner instance.
+
+```csharp
+using System;
+using TestRunner;
+
+namespace Tests
+{
+	class Program
+	{
+		static void Main(string[] args)
+		{
+			new Runner().Run("Tracing name of the Tested Lib", args);
+
+			// Await
+			Print.AsSystemTrace("Done. Press <Enter> to close.");
+			Console.ReadLine();
+
+			// Or return 0;
+		}
+	}
+}
+```
 
