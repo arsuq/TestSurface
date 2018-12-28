@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace TestRunner
@@ -63,15 +61,18 @@ namespace TestRunner
 			bool locked = false;
 			spinLock.Enter(ref locked);
 
-			var cc = Console.ForegroundColor;
-			var bc = Console.BackgroundColor;
-			Console.ForegroundColor = c;
-			if (bg.HasValue) Console.BackgroundColor = bg.Value;
-			Console.WriteLine(text, formatArgs);
-			Console.ForegroundColor = cc;
-			Console.BackgroundColor = bc;
+			if (locked)
+			{
+				var cc = Console.ForegroundColor;
+				var bc = Console.BackgroundColor;
+				Console.ForegroundColor = c;
+				if (bg.HasValue) Console.BackgroundColor = bg.Value;
+				Console.WriteLine(text, formatArgs);
+				Console.ForegroundColor = cc;
+				Console.BackgroundColor = bc;
 
-			if (locked) spinLock.Exit();
+				spinLock.Exit();
+			}
 		}
 
 		public static bool IgnoreAll = false;

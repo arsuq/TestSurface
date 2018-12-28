@@ -111,6 +111,7 @@ namespace TestRunner
 				}
 
 			var lines = FormatText.JoinLines(
+				"",
 				"Results:",
 				"  Total tests: " + SurfaceTypes.Count,
 				"  Launched: " + launched,

@@ -10,7 +10,6 @@ namespace TestRunner
 		/// <summary>
 		/// Description of the test and the arguments.
 		/// </summary>
-		/// <returns>The info text.</returns>
 		string Info { get; }
 
 		/// <summary>
