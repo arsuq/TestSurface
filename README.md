@@ -4,8 +4,8 @@
 
 ## Description
 
-This lib defines an interface, command line arguments parser and a simple printing utilities, as well as a
-test discovery and runner. In order to use the runner one has to implement the ITestSurface interface:
+The lib defines a testing contract, provides a command line arguments parser, a simple printing utility
+and a test runner. In order to use the runner one has to implement the ITestSurface interface:
 
 ```csharp
 public interface ITestSurface
