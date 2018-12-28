@@ -51,7 +51,37 @@ with -notrace and also the Print.Trace() method has a lock for correct coloring 
  
 ## Usage
 
-Add a reference to the TestRunner.dll and launch a new Runner instance.
+Add a reference to the TestRunner.dll and implement the ITestSurface interface:
+```csharp
+public class TestCase : ITestSurface
+{
+	public string Info => "Test description...";
+
+	public string FailureMessage { get; private set; }
+	public bool? Passed { get; private set; }
+	public bool RequiresArgs => false;
+	public bool IsComplete { get; private set; }
+
+	public async Task Run(IDictionary<string, List<string>> args)
+	{
+		if (args.ContainsKey("-all"))
+			// add default switches 
+			args.Add("-whatever", new List<string>() { "10", "1000" });
+
+		// The common path, i.e. either -all or -TestCase
+		var w = args["-whatever"];
+
+		// ...
+
+		if (!Passed.HasValue) Passed = true;
+		IsComplete = true;
+	}
+}
+```
+
+
+Launch a new Runner instance:
+
 
 ```csharp
 using System;
@@ -63,6 +93,7 @@ namespace Tests
 	{
 		static void Main(string[] args)
 		{
+			// The args should contain -all or -ClassName
 			new Runner().Run("Tracing name of the Tested Lib", args);
 
 			// Await
