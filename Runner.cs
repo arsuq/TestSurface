@@ -59,7 +59,7 @@ namespace TestRunner
 							{
 								Console.WriteLine();
 								Print.AsTestHeader(string.Format("{0}:", st.Name));
-
+								launched++;
 								// Copy because each test may add switches to reuse functionality.
 								// For example if -all the Run will add default flags, which should
 								// be private for that specific test only.
@@ -68,7 +68,7 @@ namespace TestRunner
 								test.Run(argsMapCopy).Wait();
 								var dur = DateTime.Now.Subtract(started);
 								var duratoin = string.Format("[{0}m {1}s {2}ms]", dur.Minutes, dur.Seconds, dur.Milliseconds);
-								launched++;
+
 								if (test.Passed.HasValue)
 								{
 									if (test.Passed.Value)
@@ -102,9 +102,11 @@ namespace TestRunner
 						Print.AsSystemTrace("The test info:");
 						Print.AsHelp(test.Info);
 					}
+					failed++;
 				}
 				catch (Exception ex)
 				{
+					failed++;
 					Print.AsError(ex.ToString());
 				}
 
@@ -120,7 +122,7 @@ namespace TestRunner
 
 			Print.Trace(lines, ConsoleColor.White, ConsoleColor.DarkBlue, SurfaceTypes.Count, passed, failed, unknowns, requireargs);
 
-			if (launched < 1)
+			if (launched < 1 && !argsMap.ContainsKey("-info"))
 				Print.Trace("Did you forget specifying a test target? Add -all or -TestSurface as an argument.",
 					ConsoleColor.Red, ConsoleColor.Black);
 

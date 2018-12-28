@@ -2,7 +2,7 @@
 
 > v1.0
 
-## Descrition
+## Description
 
 This lib defines an interface, command line arguments parser and a simple printing utilities, as well as a
 test discovery and runner. In order to use the runner one has to implement the ITestSurface interface:
@@ -35,10 +35,11 @@ and then continuing with a common execution path.
 The IDictionary<string, List<string>> holds the switches as keys (with the dash, e.g. -all) and a list of
 string arguments, provided in the console after the switch.
 
-Beside the *-all* option, there are also *-info* and *-notrace* arguments:
+Additional arguments:
 
 - including **-info** will take the Info property and trace it instead of executing the Run method.
 - with **-notrace** all *Print.Info()*, *Print.Trace()* invocations will be ignored
+- use **-brake** to stop the test launcher on the first failure
 
 Launching with -all -info will trace all test descriptions. 
 
