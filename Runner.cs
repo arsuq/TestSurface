@@ -121,11 +121,10 @@ namespace TestRunner
 				"  Skipped (require args): " + requireargs
 				);
 
-			Print.Trace(lines, ConsoleColor.White, ConsoleColor.DarkBlue, SurfaceTypes.Count, passed, failed, unknowns, requireargs);
+			Print.trace(lines, ConsoleColor.White, ConsoleColor.DarkBlue, SurfaceTypes.Count, passed, failed, unknowns, requireargs);
 
 			if (launched < 1 && !argsMap.ContainsKey("-info"))
-				Print.Trace("Did you forget specifying a test target? Add -all or -TestSurface as an argument.",
-					ConsoleColor.Red, ConsoleColor.Black);
+				Print.trace("Did you forget specifying a test target? Add -all or -TestSurface as an argument.", ConsoleColor.Red, ConsoleColor.Black);
 
 		}
 	}
