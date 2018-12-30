@@ -5,8 +5,11 @@
     <Platforms>AnyCPU;x64</Platforms>
     <Authors>Arsuq</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description />
+    <Description>Flat learning curve test runner. 
+The lib (.NET Standard) has a single interface, an argument parser, a printing utility and a launcher.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Copyright>Copyright (c) 2018 Arsuq</Copyright>
+    <PackageTags>test</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

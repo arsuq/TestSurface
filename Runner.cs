@@ -6,15 +6,15 @@ namespace TestRunner
 {
 	public class Runner
 	{
-		public void Run(string testLibName, string[] args)
+		public void Run(string[] args)
 		{
-			Print.AsSystemTrace("| ======================================");
-			Print.AsSystemTrace("| Test runner for {0}:", testLibName);
-			Print.AsSystemTrace("| To run all tests use the -all switch; for specific surface class -ITestSurface_ClassName");
-			Print.AsSystemTrace("| To suppress info tracing add -notrace");
-			Print.AsSystemTrace("| To stop on first failure add -break");
-			Print.AsSystemTrace("| For help pass the -info argument along with either -all or -YourTestClass");
-			Print.AsSystemTrace("| ======================================");
+			Print.AsSystemTrace("{0,-60}", "TEST RUNNER");
+			Print.AsSystemTrace("{0,-60}", "  Switches: ");
+			Print.AsSystemTrace("{0,-60}", "  -all: runs all tests ");
+			Print.AsSystemTrace("{0,-60}", "  -TheTestSurfaceClassName: launches one test only ");
+			Print.AsSystemTrace("{0,-60}", "  -notrace: ignores info tracing ");
+			Print.AsSystemTrace("{0,-60}", "  -break: on first failure ");
+			Print.AsSystemTrace("{0,-60}", "  -info: traces the test descriptions  ");
 
 			Console.WriteLine();
 
@@ -26,7 +26,7 @@ namespace TestRunner
 
 			if (argsMap.ContainsKey("-notrace")) Print.IgnoreInfo = true;
 
-			Print.AsSystemTrace("There are {0} tests available", SurfaceTypes.Count);
+			Print.AsSystemTrace($"There are {SurfaceTypes.Count} tests.");
 			Console.WriteLine();
 
 			ITestSurface test = null;
@@ -110,22 +110,21 @@ namespace TestRunner
 					Print.AsError(ex.ToString());
 				}
 
-			var lines = FormatText.JoinLines(
-				"",
-				"Results:",
-				"  Total tests: " + SurfaceTypes.Count,
-				"  Launched: " + launched,
-				"  Passed: " + passed,
-				"  Failed: " + failed,
-				"  Unknown: " + unknowns,
-				"  Skipped (require args): " + requireargs
-				);
 
-			Print.trace(lines, ConsoleColor.White, ConsoleColor.DarkBlue, SurfaceTypes.Count, passed, failed, unknowns, requireargs);
+			Console.WriteLine();
+
+			Print.AsSystemTrace("{0, -20}", "RESULTS:");
+			Print.AsSystemTrace("  {0, 12} {1,-5}", "Tests found:", SurfaceTypes.Count);
+			Print.AsSystemTrace("  {0, 12} {1,-5}", "Launched:", launched);
+			Print.AsSystemTrace("  {0, 12} {1,-5}", "Passed:", passed);
+			Print.AsSystemTrace("  {0, 12} {1,-5}", "Failed:", failed);
+			Print.AsSystemTrace("  {0, 12} {1,-5}", "Unknown:", unknowns);
+			Print.AsSystemTrace("  {0, 12} {1,-5}", "Skipped:", requireargs);
+
+			Console.WriteLine();
 
 			if (launched < 1 && !argsMap.ContainsKey("-info"))
-				Print.trace("Did you forget specifying a test target? Add -all or -TestSurface as an argument.", ConsoleColor.Red, ConsoleColor.Black);
-
+				Print.Trace("Did you forget specifying a test target? Add -all or -TestSurface as an argument.", ConsoleColor.Red, ConsoleColor.Black);
 		}
 	}
 }

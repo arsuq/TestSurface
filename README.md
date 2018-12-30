@@ -1,4 +1,4 @@
-﻿# Test runner
+﻿ Test runner
 
 > v1.0
 
@@ -92,7 +92,7 @@ namespace Tests
 		static void Main(string[] args)
 		{
 			// The args should contain -all or -ClassName
-			new Runner().Run("Tracing name of the Tested Lib", args);
+			new Runner().Run(args);
 
 			// Await
 			Print.AsSystemTrace("Done. Press <Enter> to close.");
