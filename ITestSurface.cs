@@ -29,15 +29,14 @@ namespace TestRunner
 
 		/// <summary>
 		/// Some tests have no default initial values or require multiple instances
-		/// of the test app to be running at the sane time.
+		/// of the test application to be running at the same time.
 		/// </summary>
 		bool RequiresArgs { get; }
 		
 		/// <summary>
-		/// A task which may or may not be started.
-		/// The runner will Wait() for each task.
+		/// If launched, the runner will wait for it to complete.
 		/// </summary>
-		/// <param name="args">The parsed arguments as a dictionary where keys are the switches.</param>
+		/// <param name="args">The parsed arguments dictionary where the keys are switches.</param>
 		/// <returns>A task to be awaited.</returns>
 		Task Run(ArgMap args);
 	}
