@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace TestRunner
+namespace TestSurface
 {
 	using ArgMap = IDictionary<string, List<string>>;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace TestRunner
+namespace TestSurface
 {
 	public static class Print
 	{

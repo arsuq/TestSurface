@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TestRunner
+namespace TestSurface
 {
 	public class ArgsParser
 	{

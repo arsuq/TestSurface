@@ -1,4 +1,4 @@
-﻿ Test runner
+﻿# Test Surface
 
 > v1.0
 
@@ -83,7 +83,7 @@ Launch a new Runner instance:
 
 ```csharp
 using System;
-using TestRunner;
+using TestSurface;
 
 namespace Tests
 {

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace TestRunner
+namespace TestSurface
 {
 	public static class FormatText
 	{

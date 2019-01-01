@@ -11,7 +11,7 @@
     <PackageTags>test</PackageTags>
     <ApplicationIcon />
     <Win32Resource />
-    <PackageIconUrl>https://raw.githubusercontent.com/arsuq/TestRunner/master/TestRunner.png</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/arsuq/TestSurface/master/TestSurface.png</PackageIconUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
