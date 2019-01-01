@@ -12,6 +12,9 @@
     <ApplicationIcon />
     <Win32Resource />
     <PackageIconUrl>https://raw.githubusercontent.com/arsuq/TestSurface/master/TestSurface.png</PackageIconUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/arsuq/TestSurface/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl>https://github.com/arsuq/TestSurface</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
