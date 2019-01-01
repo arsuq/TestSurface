@@ -45,7 +45,7 @@ Launching with -all -info will trace all test descriptions.
 Use **Print** to trace info during the test instead of Console directly for it can be suppressed
 with -notrace and also the Print.Trace() method has a lock for correct coloring in multi-threaded code. 
 
-<br>
+
 
  
 ## Usage
