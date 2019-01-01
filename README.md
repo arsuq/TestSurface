@@ -23,7 +23,7 @@ The runner can be launched in two modes:
 
 - with a specific test class and arguments, by passing a **-TheTestClassName** as a command line parameter
 - with **-all** to discover all the compatible classes and invoke their Run method.
-  Classes having *RequiresArgs = true* will be ignored as they cannot be fed with specific data
+  Tests having *RequiresArgs = true* will be ignored as they cannot be fed with specific data
   because that could brake the rest of the tests. 
 
 The ArgMap type is an IDictionary<string, List<string>> instance, produced by the ArgsParser. 

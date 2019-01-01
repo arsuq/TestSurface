@@ -8,13 +8,14 @@ namespace TestRunner
 	{
 		public void Run(string[] args)
 		{
-			Print.AsSystemTrace("{0,-60}", "TEST RUNNER");
-			Print.AsSystemTrace("{0,-60}", "  Switches: ");
-			Print.AsSystemTrace("{0,-60}", "  -all: runs all tests ");
-			Print.AsSystemTrace("{0,-60}", "  -TheTestSurfaceClassName: launches one test only ");
-			Print.AsSystemTrace("{0,-60}", "  -notrace: ignores info tracing ");
-			Print.AsSystemTrace("{0,-60}", "  -break: on first failure ");
-			Print.AsSystemTrace("{0,-60}", "  -info: traces the test descriptions  ");
+			const string pad60 = "{0,-60}";
+			Print.AsSystemTrace(pad60, "TEST RUNNER");
+			Print.AsSystemTrace(pad60, "  Switches: ");
+			Print.AsSystemTrace(pad60, "  -all: runs all tests ");
+			Print.AsSystemTrace(pad60, "  -TheTestSurfaceClassName: launches one test only ");
+			Print.AsSystemTrace(pad60, "  -notrace: ignores info tracing ");
+			Print.AsSystemTrace(pad60, "  -break: on first failure ");
+			Print.AsSystemTrace(pad60, "  -info: traces the test descriptions  ");
 
 			Console.WriteLine();
 
@@ -112,14 +113,14 @@ namespace TestRunner
 
 
 			Console.WriteLine();
-
+			const string pad12 = "  {0, 12} {1,-5}";
 			Print.AsSystemTrace("{0, -20}", "RESULTS:");
-			Print.AsSystemTrace("  {0, 12} {1,-5}", "Tests found:", SurfaceTypes.Count);
-			Print.AsSystemTrace("  {0, 12} {1,-5}", "Launched:", launched);
-			Print.AsSystemTrace("  {0, 12} {1,-5}", "Passed:", passed);
-			Print.AsSystemTrace("  {0, 12} {1,-5}", "Failed:", failed);
-			Print.AsSystemTrace("  {0, 12} {1,-5}", "Unknown:", unknowns);
-			Print.AsSystemTrace("  {0, 12} {1,-5}", "Skipped:", requireargs);
+			Print.AsSystemTrace(pad12, "Tests found:", SurfaceTypes.Count);
+			Print.AsSystemTrace(pad12, "Launched:", launched);
+			Print.AsSystemTrace(pad12, "Passed:", passed);
+			Print.AsSystemTrace(pad12, "Failed:", failed);
+			Print.AsSystemTrace(pad12, "Unknown:", unknowns);
+			Print.AsSystemTrace(pad12, "Skipped:", requireargs);
 
 			Console.WriteLine();
 
