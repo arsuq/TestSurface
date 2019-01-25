@@ -1,13 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace TestSurface
 {
 	public class Runner
 	{
+		public Runner()
+		{
+			Exceptions = new List<Exception>();
+			ResultMap = new Dictionary<Type, ITestSurface>();
+		}
+
+		/// <summary>
+		/// Starts all discoverable tests. 
+		/// </summary>
+		/// <remarks>
+		/// Only one Run execution at a time is allowed.
+		/// </remarks>
+		/// <exception cref="System.InvalidOperationException">If another Run is still executing.</exception>
+		/// <param name="args">The arguments list</param>
 		public void Run(string[] args)
 		{
+			if (Interlocked.CompareExchange(ref isRuning, 1, 0) > 0) throw new InvalidOperationException("Tests are running");
+
+			RunsCount++;
+			Args = args;
+			Exceptions.Clear();
+			ResultMap.Clear();
+
 			const string pad60 = "{0,-60}";
 			Print.AsSystemTrace(pad60, "TEST RUNNER");
 			Print.AsSystemTrace(pad60, "  Switches: ");
@@ -31,7 +53,7 @@ namespace TestSurface
 			Console.WriteLine();
 
 			ITestSurface test = null;
-			int passed = 0, failed = 0, skipped = 0, unknowns = 0, launched = 0;
+			Passed = 0; Failed = 0; Skipped = 0; Unknown = 0; Launched = 0;
 
 			foreach (var st in SurfaceTypes)
 				try
@@ -42,11 +64,12 @@ namespace TestSurface
 					if (runAll || argsMap.ContainsKey(string.Format("-{0}", st.Name)))
 					{
 						test = Activator.CreateInstance(st) as ITestSurface;
+
 						if (test != null)
 						{
 							if (runAll && test.IndependentLaunchOnly)
 							{
-								skipped++;
+								Skipped++;
 								continue;
 							}
 
@@ -58,9 +81,11 @@ namespace TestSurface
 							}
 							else
 							{
+								ResultMap.Add(st, test);
+
 								Console.WriteLine();
 								Print.AsTestHeader(string.Format("{0}:", st.Name));
-								launched++;
+								Launched++;
 								// Copy because each test may add switches to reuse functionality.
 								// For example if -all the Run will add default flags, which should
 								// be private for that specific test only.
@@ -74,19 +99,19 @@ namespace TestSurface
 								{
 									if (test.Passed.Value)
 									{
-										passed++;
+										Passed++;
 										Print.AsTestSuccess(string.Format("OK: {0} {1}", st.Name, duratoin));
 									}
 									else
 									{
-										failed++;
+										Failed++;
 										Print.AsTestFailure(string.Format("FAIL: {0} {1} Ex: {2}", st.Name, duratoin, test.FailureMessage));
 										if (breakOnFirstFailure) break;
 									}
 								}
 								else
 								{
-									unknowns++;
+									Unknown++;
 									Print.AsTestUnknown(string.Format("UNKNOWN: {0} {1}", st.Name, duratoin));
 								}
 							}
@@ -96,6 +121,7 @@ namespace TestSurface
 				}
 				catch (KeyNotFoundException kex)
 				{
+					Exceptions.Add(kex);
 					Print.AsError("Argument error for test: " + st.Name);
 					Print.AsError(kex.Message);
 					if (test != null)
@@ -103,11 +129,12 @@ namespace TestSurface
 						Print.AsSystemTrace("The test info:");
 						Print.AsHelp(test.Info);
 					}
-					failed++;
+					Failed++;
 				}
 				catch (Exception ex)
 				{
-					failed++;
+					Exceptions.Add(ex);
+					Failed++;
 					Print.AsError(ex.ToString());
 				}
 
@@ -116,16 +143,32 @@ namespace TestSurface
 			const string pad12 = "  {0, 12} {1,-5}";
 			Print.AsSystemTrace("{0, -20}", "RESULTS:");
 			Print.AsSystemTrace(pad12, "Tests found:", SurfaceTypes.Count);
-			Print.AsSystemTrace(pad12, "Launched:", launched);
-			Print.AsSystemTrace(pad12, "Passed:", passed);
-			Print.AsSystemTrace(pad12, "Failed:", failed);
-			Print.AsSystemTrace(pad12, "Unknown:", unknowns);
-			Print.AsSystemTrace(pad12, "Skipped:", skipped);
+			Print.AsSystemTrace(pad12, "Runs count:", RunsCount);
+			Print.AsSystemTrace(pad12, "Launched:", Launched);
+			Print.AsSystemTrace(pad12, "Passed:", Passed);
+			Print.AsSystemTrace(pad12, "Failed:", Failed);
+			Print.AsSystemTrace(pad12, "Unknown:", Unknown);
+			Print.AsSystemTrace(pad12, "Skipped:", Skipped);
 
 			Console.WriteLine();
 
-			if (launched < 1 && !argsMap.ContainsKey("-info"))
+			if (Launched < 1 && !argsMap.ContainsKey("-info"))
 				Print.Trace("Did you forget specifying a test target? Add -all or -TestSurface as an argument.", ConsoleColor.Red, ConsoleColor.Black);
+
+			Interlocked.Exchange(ref isRuning, 0);
 		}
+
+		public int Passed { get; private set; }
+		public int Failed { get; private set; }
+		public int Skipped { get; private set; }
+		public int Unknown { get; private set; }
+		public int Launched { get; private set; }
+		public int RunsCount { get; private set; }
+
+		public string[] Args { get; private set; }
+		public Dictionary<Type, ITestSurface> ResultMap { get; private set; }
+		public List<Exception> Exceptions { get; private set; }
+
+		int isRuning;
 	}
 }

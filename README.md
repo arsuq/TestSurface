@@ -65,10 +65,10 @@ public class TestCase : ITestSurface
 	{
 		if (args.ContainsKey("-all"))
 			// add default switches 
-			args.Add("-whatever", new List<string>() { "10", "1000" });
+			args.Add("-param", new List<string>() { "10", "1000" });
 
 		// The common path, i.e. either -all or -TestCase
-		var w = args["-whatever"];
+		var w = args["-param"];
 
 		// ...
 
@@ -88,20 +88,19 @@ using TestSurface;
 
 namespace Tests
 {
-	class Program
-	{
-		static void Main(string[] args)
-		{
-			// The args should contain -all or -ClassName
-			new Runner().Run(args);
-
-			// Await
-			Print.AsSystemTrace("Done. Press <Enter> to close.");
-			Console.ReadLine();
-
-			// Or return 0;
-		}
-	}
+    class Program
+    {
+        static int Main(string[] args)
+        {
+            var r = new Runner();
+           
+            // The args should contain -all or -ClassName
+            r.Run(args);
+            
+            // Check the ResultMap, Exceptions or Passed/Failed/Skipped counters
+            return (r.Exceptions.Count < 1 && r.Passed > 0) ? 0 : -r.Failed;
+        }
+    }
 }
 ```
 

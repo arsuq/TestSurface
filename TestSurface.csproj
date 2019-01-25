@@ -7,7 +7,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Flat learning curve test runner. The lib (.NET Standard) has a single interface, an argument parser, a printing utility and a launcher.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Copyright>Copyright (c) 2018 Arsuq</Copyright>
+    <Copyright>Copyright (c) 2019 Arsuq</Copyright>
     <PackageTags>test</PackageTags>
     <ApplicationIcon />
     <Win32Resource />
@@ -15,9 +15,9 @@
     <PackageLicenseUrl>https://raw.githubusercontent.com/arsuq/TestSurface/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://github.com/arsuq/TestSurface</RepositoryUrl>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <FileVersion>1.0.1.0</FileVersion>
-    <Version>1.0.1</Version>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

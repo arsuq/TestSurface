@@ -37,5 +37,15 @@
             <param name="args">The parsed arguments dictionary where the keys are switches.</param>
             <returns>A task to be awaited.</returns>
         </member>
+        <member name="M:TestSurface.Runner.Run(System.String[])">
+            <summary>
+            Starts all discoverable tests. 
+            </summary>
+            <remarks>
+            Only one Run execution at a time is allowed.
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">If another Run is still executing.</exception>
+            <param name="args">The arguments list</param>
+        </member>
     </members>
 </doc>
