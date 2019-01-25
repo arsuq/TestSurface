@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TestSurface</name>
+    </assembly>
+    <members>
+        <member name="P:TestSurface.ITestSurface.Info">
+            <summary>
+            Description of the test and the arguments.
+            </summary>
+        </member>
+        <member name="P:TestSurface.ITestSurface.FailureMessage">
+            <summary>
+            Set if the test fails.
+            </summary>
+        </member>
+        <member name="P:TestSurface.ITestSurface.Passed">
+            <summary>
+            Set in all cases, null means unknown outcome.
+            </summary>
+        </member>
+        <member name="P:TestSurface.ITestSurface.IsComplete">
+            <summary>
+            Indicates whether the whole test was covered or some parts were skipped.
+            </summary>
+        </member>
+        <member name="P:TestSurface.ITestSurface.IndependentLaunchOnly">
+            <summary>
+            Some tests have no default initial values or require multiple instances
+            of the test application to be running at the same time.
+            </summary>
+        </member>
+        <member name="M:TestSurface.ITestSurface.Run(System.Collections.Generic.IDictionary{System.String,System.Collections.Generic.List{System.String}})">
+            <summary>
+            If launched, the runner will wait for it to complete.
+            </summary>
+            <param name="args">The parsed arguments dictionary where the keys are switches.</param>
+            <returns>A task to be awaited.</returns>
+        </member>
+    </members>
+</doc>

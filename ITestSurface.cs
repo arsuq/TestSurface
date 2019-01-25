@@ -31,7 +31,7 @@ namespace TestSurface
 		/// Some tests have no default initial values or require multiple instances
 		/// of the test application to be running at the same time.
 		/// </summary>
-		bool RequiresArgs { get; }
+		bool IndependentLaunchOnly { get; }
 		
 		/// <summary>
 		/// If launched, the runner will wait for it to complete.

@@ -31,7 +31,7 @@ namespace TestSurface
 			Console.WriteLine();
 
 			ITestSurface test = null;
-			int passed = 0, failed = 0, requireargs = 0, unknowns = 0, launched = 0;
+			int passed = 0, failed = 0, skipped = 0, unknowns = 0, launched = 0;
 
 			foreach (var st in SurfaceTypes)
 				try
@@ -44,9 +44,9 @@ namespace TestSurface
 						test = Activator.CreateInstance(st) as ITestSurface;
 						if (test != null)
 						{
-							if (runAll && test.RequiresArgs)
+							if (runAll && test.IndependentLaunchOnly)
 							{
-								requireargs++;
+								skipped++;
 								continue;
 							}
 
@@ -120,7 +120,7 @@ namespace TestSurface
 			Print.AsSystemTrace(pad12, "Passed:", passed);
 			Print.AsSystemTrace(pad12, "Failed:", failed);
 			Print.AsSystemTrace(pad12, "Unknown:", unknowns);
-			Print.AsSystemTrace(pad12, "Skipped:", requireargs);
+			Print.AsSystemTrace(pad12, "Skipped:", skipped);
 
 			Console.WriteLine();
 

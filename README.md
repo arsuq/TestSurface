@@ -15,7 +15,7 @@ public interface ITestSurface
 	string FailureMessage { get; }
 	bool? Passed { get; }
 	bool IsComplete { get; }
-	bool RequiresArgs { get; }
+	bool IndependentLaunchOnly { get; }
 	Task Run(ArgMap args);
 }
 ``` 
@@ -24,7 +24,7 @@ The runner can be launched in two modes:
 
 - with a specific test class and arguments, by passing a **-TheTestClassName** as a command line parameter
 - with **-all** to discover all the compatible classes and invoke their Run method.
-  Tests having *RequiresArgs = true* will be ignored as they cannot be fed with specific data
+  Tests having *IndependentLaunchOnly = true* will be ignored as they cannot be fed with specific data
   because that could brake the rest of the tests. 
 
 The ArgMap type is an IDictionary<string, List<string>> instance, produced by the ArgsParser. 
@@ -58,7 +58,7 @@ public class TestCase : ITestSurface
 
 	public string FailureMessage { get; private set; }
 	public bool? Passed { get; private set; }
-	public bool RequiresArgs => false;
+	public bool IndependentLaunchOnly => false;
 	public bool IsComplete { get; private set; }
 
 	public async Task Run(IDictionary<string, List<string>> args)
