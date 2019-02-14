@@ -54,6 +54,7 @@ namespace TestSurface
 
 			ITestSurface test = null;
 			Passed = 0; Failed = 0; Skipped = 0; Unknown = 0; Launched = 0;
+			var runStart = DateTime.Now;
 
 			foreach (var st in SurfaceTypes)
 				try
@@ -138,17 +139,20 @@ namespace TestSurface
 					Print.AsError(ex.ToString());
 				}
 
+			var rdur = DateTime.Now.Subtract(runStart);
+			var rdurStr = $"{rdur.Hours}h {rdur.Minutes}m {rdur.Seconds}s {rdur.Milliseconds}ms ";
 
 			Console.WriteLine();
-			const string pad12 = "  {0, 12} {1,-5}";
-			Print.AsSystemTrace("{0, -20}", "RESULTS:");
-			Print.AsSystemTrace(pad12, "Tests found:", SurfaceTypes.Count);
-			Print.AsSystemTrace(pad12, "Runs count:", RunsCount);
-			Print.AsSystemTrace(pad12, "Launched:", Launched);
-			Print.AsSystemTrace(pad12, "Passed:", Passed);
-			Print.AsSystemTrace(pad12, "Failed:", Failed);
-			Print.AsSystemTrace(pad12, "Unknown:", Unknown);
-			Print.AsSystemTrace(pad12, "Skipped:", Skipped);
+			const string pad = "  {0, 13} {1,-5}";
+			Print.AsSystemTrace("{0, -21}", "RESULTS:");
+			Print.AsSystemTrace(pad, "Tests found:", SurfaceTypes.Count);
+			Print.AsSystemTrace(pad, "Runs count:", RunsCount);
+			Print.AsSystemTrace(pad, "Launched:", Launched);
+			Print.AsSystemTrace(pad, "Passed:", Passed);
+			Print.AsSystemTrace(pad, "Failed:", Failed);
+			Print.AsSystemTrace(pad, "Unknown:", Unknown);
+			Print.AsSystemTrace(pad, "Skipped:", Skipped);
+			Print.AsSystemTrace(pad, "Run duration:", rdurStr );
 
 			Console.WriteLine();
 
