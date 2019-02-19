@@ -4,6 +4,19 @@
         <name>TestSurface</name>
     </assembly>
     <members>
+        <member name="M:TestSurface.Assert.SameValues(System.Object,System.Object,System.Nullable{System.Reflection.BindingFlags})">
+            <summary>
+            Compares the two objects by value. 
+            Selects all public fields and properties if no BindingFlags are provided.
+            </summary>
+            <returns>True if the objects are the same, compared according to the BindingFlags selection.</returns>
+            <exception cref="T:System.ArgumentException">When the objects types mismatch.</exception>
+        </member>
+        <member name="M:TestSurface.Assert.ClearTypeCache">
+            <summary>
+            Erases the cached type meta-data,
+            </summary>
+        </member>
         <member name="P:TestSurface.ITestSurface.Info">
             <summary>
             Description of the test and the arguments.
