@@ -50,6 +50,56 @@
             <param name="args">The parsed arguments dictionary where the keys are switches.</param>
             <returns>A task to be awaited.</returns>
         </member>
+        <member name="M:TestSurface.Print.Trace(System.String,System.Int32,System.Boolean,System.ConsoleColor,System.ConsoleColor,System.Object[])">
+            <summary>
+            Traces the text if both IgnoreInfo and IgnoreAll are false.
+            </summary>
+            <param name="text">The text string.</param>
+            <param name="leftMargin">Number of chars to pad each line.</param>
+            <param name="split">Splits the text into multiple lines and adds the margin.</param>
+            <param name="c">The trace foreground color.</param>
+            <param name="bg">The trace background color. </param>
+            <param name="formatArgs">The standard string format arguments.</param>
+        </member>
+        <member name="F:TestSurface.Print.SPLIT_LINE">
+            <summary>
+            The text splitter string.
+            The default is Environment.NewLine.
+            </summary>
+        </member>
+        <member name="F:TestSurface.Print.SplitOptions">
+            <summary>
+            By default is set to StringSplitOptions.None.
+            </summary>
+        </member>
+        <member name="F:TestSurface.Print.IgnoreAll">
+            <summary>
+            Never traces if true.
+            </summary>
+        </member>
+        <member name="F:TestSurface.Print.IgnoreInfo">
+            <summary>
+            Ignores all but the SystemTrace and the test header and status
+            </summary>
+        </member>
+        <member name="F:TestSurface.Print.LockAwaitMS">
+            <summary>
+            Will bail tracing after waiting the specified timeout in milliseconds.
+            If ThrowOnLockTimeout is true will throw a TimeoutException.
+            The default value is 100.
+            </summary>
+        </member>
+        <member name="F:TestSurface.Print.ThrowOnLockTimeout">
+            <summary>
+            By default is true.
+            </summary>
+        </member>
+        <member name="F:TestSurface.Print.SerializeTraces">
+            <summary>
+            If there is no threading involved set to false.
+            Starts as true.
+            </summary>
+        </member>
         <member name="M:TestSurface.Runner.Run(System.String[])">
             <summary>
             Starts all discoverable tests. 
