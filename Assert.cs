@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace TestSurface
@@ -13,9 +14,10 @@ namespace TestSurface
 		/// </summary>
 		/// <returns>True if the objects are the same, compared according to the BindingFlags selection.</returns>
 		/// <exception cref="ArgumentException">When the objects types mismatch.</exception>
-		public static bool SameValues(object a, object b, BindingFlags? bf = null)
+		public static bool SameValues(object a, object b, BindingFlags? bf = null, HashSet<object> visited = null)
 		{
 			if (!bf.HasValue) bf = BindingFlags.Public | BindingFlags.Instance;
+			if (visited == null) visited = new HashSet<object>();
 
 			if (a == null) return b == null;
 			if (b == null) return false;
@@ -25,6 +27,17 @@ namespace TestSurface
 
 			if ((t.IsPrimitive || t.IsValueType)) return a.Equals(b);
 			if (typeof(IComparable).IsAssignableFrom(t)) return ((IComparable)a).CompareTo(b) == 0;
+
+			var av = visited.Contains(a);
+			var bv = visited.Contains(b);
+
+			if (av != bv) return false;
+			else if (av == true) return true;
+			else
+			{
+				visited.Add(a);
+				visited.Add(b);
+			}
 
 			if (!fields.ContainsKey(t)) fields.TryAdd(t, t.GetFields(bf.Value));
 			if (!props.ContainsKey(t)) props.TryAdd(t, t.GetProperties(bf.Value));
@@ -39,9 +52,9 @@ namespace TestSurface
 
 				if ((typeof(IEnumerable).IsAssignableFrom(f.FieldType)))
 				{
-					if (!sameSeq(ao, bo, bf)) return false;
+					if (!sameSeq(ao, bo, bf, visited)) return false;
 				}
-				else if (!SameValues(ao, bo, bf)) return false;
+				else if (!SameValues(ao, bo, bf, visited)) return false;
 			}
 
 			foreach (var p in P)
@@ -54,9 +67,9 @@ namespace TestSurface
 
 				if ((typeof(IEnumerable).IsAssignableFrom(p.PropertyType)))
 				{
-					if (!sameSeq(ao, bo, bf)) return false;
+					if (!sameSeq(ao, bo, bf, visited)) return false;
 				}
-				else if (!SameValues(ao, bo, bf)) return false;
+				else if (!SameValues(ao, bo, bf, visited)) return false;
 			}
 
 			return true;
@@ -71,7 +84,7 @@ namespace TestSurface
 			props.Clear();
 		}
 
-		static bool sameSeq(object ao, object bo, BindingFlags? bf)
+		static bool sameSeq(object ao, object bo, BindingFlags? bf, HashSet<object> visited)
 		{
 			var ae = ((IEnumerable)ao).GetEnumerator();
 			var be = ((IEnumerable)bo).GetEnumerator();
@@ -80,7 +93,7 @@ namespace TestSurface
 
 			while (ar && br)
 			{
-				if (!SameValues(ae.Current, be.Current, bf)) return false;
+				if (!SameValues(ae.Current, be.Current, bf, visited)) return false;
 				ar = ae.MoveNext();
 				br = be.MoveNext();
 			}

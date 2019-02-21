@@ -4,7 +4,7 @@
         <name>TestSurface</name>
     </assembly>
     <members>
-        <member name="M:TestSurface.Assert.SameValues(System.Object,System.Object,System.Nullable{System.Reflection.BindingFlags})">
+        <member name="M:TestSurface.Assert.SameValues(System.Object,System.Object,System.Nullable{System.Reflection.BindingFlags},System.Collections.Generic.HashSet{System.Object})">
             <summary>
             Compares the two objects by value. 
             Selects all public fields and properties if no BindingFlags are provided.
