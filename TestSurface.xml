@@ -4,6 +4,17 @@
         <name>TestSurface</name>
     </assembly>
     <members>
+        <member name="M:TestSurface.ArgsParser.Parse(System.String,System.Char,System.String[])">
+            <summary>
+            Will return a map with keys the args elements prefixed with argPrf 
+            and values all strings until the next option or the end of the array.
+            Values without an option are placed in the defaultKey list.
+            </summary>
+            <param name="defaultKey">For values without a leading switch.</param>
+            <param name="argPrf">The switches prefix.</param>
+            <param name="args">The values to be arranged.</param>
+            <returns></returns>
+        </member>
         <member name="M:TestSurface.Assert.SameValues(System.Object,System.Object,System.Nullable{System.Reflection.BindingFlags},System.Collections.Generic.HashSet{System.Object})">
             <summary>
             Compares the two objects by value. 
@@ -82,7 +93,7 @@
             Ignores all but the SystemTrace and the test header and status
             </summary>
         </member>
-        <member name="F:TestSurface.Print.LockAwaitMS">
+        <member name="P:TestSurface.Print.LockAwaitMS">
             <summary>
             Will bail tracing after waiting the specified timeout in milliseconds.
             If ThrowOnLockTimeout is true will throw a TimeoutException.
@@ -100,6 +111,11 @@
             Starts as true.
             </summary>
         </member>
+        <member name="T:TestSurface.Runner">
+            <summary>
+            The ITestSurface launcher.
+            </summary>
+        </member>
         <member name="M:TestSurface.Runner.Run(System.String[])">
             <summary>
             Starts all discoverable tests. 
@@ -109,6 +125,77 @@
             </remarks>
             <exception cref="T:System.InvalidOperationException">If another Run is still executing.</exception>
             <param name="args">The arguments list</param>
+        </member>
+        <member name="M:TestSurface.Runner.GetTotalStats">
+            <summary>
+            Aggregates all counters.
+            </summary>
+        </member>
+        <member name="M:TestSurface.Runner.PrintTotalStats">
+            <summary>
+            Prints the aggregated counters for all runs.
+            </summary>
+        </member>
+        <member name="P:TestSurface.Runner.RunHistory">
+            <summary>
+            The test runs history in order.
+            </summary>
+        </member>
+        <member name="P:TestSurface.Runner.SurfaceTypes">
+            <summary>
+            All discovered ITestSurface implementations
+            </summary>
+        </member>
+        <member name="T:TestSurface.RunRecordStats">
+            <summary>
+            The basic Run counters. When returned from GetTotalStats()
+            the values are aggregated from all runs.
+            </summary>
+        </member>
+        <member name="T:TestSurface.RunRecord">
+            <summary>
+            Keeps a map of the activated ITestSurface types
+            </summary>
+        </member>
+        <member name="P:TestSurface.RunRecord.OriginalArgs">
+            <summary>
+            As passed to the launcher
+            </summary>
+        </member>
+        <member name="P:TestSurface.RunRecord.Tests">
+            <summary>
+            A map of the surface instances. 
+            </summary>
+        </member>
+        <member name="T:TestSurface.SurfaceRunRecord">
+            <summary>
+            An ITestSurface instance run record
+            </summary>
+        </member>
+        <member name="P:TestSurface.SurfaceRunRecord.RunIndex">
+            <summary>
+            Index in the runs sequence.
+            </summary>
+        </member>
+        <member name="P:TestSurface.SurfaceRunRecord.Instance">
+            <summary>
+            The Surface instance.
+            </summary>
+        </member>
+        <member name="P:TestSurface.SurfaceRunRecord.ArgsMap">
+            <summary>
+            A copy of the original args, including private modification.
+            </summary>
+        </member>
+        <member name="P:TestSurface.SurfaceRunRecord.Exception">
+            <summary>
+            Caught from the launcher.
+            </summary>
+        </member>
+        <member name="P:TestSurface.SurfaceRunRecord.Duration">
+            <summary>
+            The running time.
+            </summary>
         </member>
     </members>
 </doc>

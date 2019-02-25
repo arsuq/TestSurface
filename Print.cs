@@ -11,8 +11,10 @@ namespace TestSurface
 			Background = Console.BackgroundColor;
 		}
 
+		public static void Line() { if (!IgnoreAll) Console.WriteLine(); }
+
 		public static void AsHelp(this string text, params object[] formatArgs) =>
-			trace(text, 0, false, ForegroundError, Background, formatArgs);
+			trace(text, 0, false, ForegroundHelp, Background, formatArgs);
 
 		public static void AsSystemTrace(this string text, params object[] formatArgs) =>
 			trace(text, 0, false, ForegroundSystemTrace, BackgroundSystemTrace, formatArgs);
@@ -79,7 +81,7 @@ namespace TestSurface
 			var L = split ? text.Split(SPLIT_LINE, SplitOptions) : null;
 			var pass = false;
 
-			if (SerializeTraces) spinLock.TryEnter(LockAwaitMS, ref pass);
+			if (SerializeTraces) spinLock.TryEnter(lockAwaitMS, ref pass);
 			else pass = true;
 
 			if (pass)
@@ -102,7 +104,7 @@ namespace TestSurface
 				if (SerializeTraces) spinLock.Exit();
 			}
 			else if (ThrowOnLockTimeout)
-				throw new TimeoutException($"Failed to acquire the trace lock in {LockAwaitMS}ms.");
+				throw new TimeoutException($"Failed to acquire the trace lock in {lockAwaitMS}ms.");
 		}
 
 		/// <summary>
@@ -131,7 +133,19 @@ namespace TestSurface
 		/// If ThrowOnLockTimeout is true will throw a TimeoutException.
 		/// The default value is 100.
 		/// </summary>
-		public static int LockAwaitMS = 100;
+		public static int LockAwaitMS
+		{
+			get => lockAwaitMS;
+			set
+			{
+				// Even 100 is too much
+				if (value < 0 || value > 200)
+					throw new ArgumentOutOfRangeException("LockAwaitMS", "Set SerializeTraces to false and use a kernel level lock!");
+
+				lockAwaitMS = value;
+			}
+		}
+		static int lockAwaitMS = 100;
 
 		/// <summary>
 		/// By default is true.

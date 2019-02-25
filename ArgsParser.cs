@@ -3,39 +3,41 @@ using System.Collections.Generic;
 
 namespace TestSurface
 {
-	public class ArgsParser
+	public static class ArgsParser
 	{
-		public const char SWITCH_SYMBOL = '-';
-
-		public ArgsParser(string[] args)
+		/// <summary>
+		/// Will return a map with keys the args elements prefixed with argPrf 
+		/// and values all strings until the next option or the end of the array.
+		/// Values without an option are placed in the defaultKey list.
+		/// </summary>
+		/// <param name="defaultKey">For values without a leading switch.</param>
+		/// <param name="argPrf">The switches prefix.</param>
+		/// <param name="args">The values to be arranged.</param>
+		/// <returns></returns>
+		public static Dictionary<string, List<string>> Parse(string defaultKey, char argPrf, params string[] args)
 		{
-			if (args == null) throw new ArgumentNullException("args");
+			var argsMap = new Dictionary<string, List<string>>();
 
-			if (args.Length > 0)
+			if (args != null && args.Length > 0)
 			{
+				argsMap.Add(defaultKey, new List<string>());
 				var sw = string.Empty;
 
 				foreach (var arg in args)
 				{
-					if (arg[0] == SWITCH_SYMBOL)
+					if (arg[0] == argPrf)
 					{
 						sw = arg;
 						argsMap.Add(arg, new List<string>());
 					}
-					else if (!string.IsNullOrEmpty(sw))
-						argsMap[sw].Add(arg);
+					else if (!string.IsNullOrEmpty(sw)) argsMap[sw].Add(arg);
+					else argsMap[defaultKey].Add(arg);
 				}
 			}
+
+			return argsMap;
 		}
 
-
-		public IDictionary<string, List<string>> Map => argsMap;
-
-		Dictionary<string, List<string>> argsMap = new Dictionary<string, List<string>>();
-	}
-
-	public static class ArgsParserExt
-	{
 		public static void AssertAll(this IDictionary<string, List<string>> map, params string[] mandatorySwitches)
 		{
 			if (map == null) throw new ArgumentNullException("map");
