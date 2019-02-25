@@ -1,4 +1,4 @@
-﻿![s](Launcher.png)
+﻿![](https://raw.githubusercontent.com/arsuq/TestSurface/master/Launcher.png)
 
 # Test Surface
 
