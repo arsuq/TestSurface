@@ -15,14 +15,11 @@
     <PackageLicenseUrl>https://raw.githubusercontent.com/arsuq/TestSurface/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://github.com/arsuq/TestSurface</RepositoryUrl>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
-    <Version>1.1</Version>
-    <PackageReleaseNotes>1. There are two switch levels: [+] for the ITestSurface implementations and [-] for the options
-2. The options 'all', 'brake' and 'notrace' use the [+] prefix
-3. The runner keeps execution history 
-4. Added -noprint and -skip launching options
-5. The ArgsParser class is static</PackageReleaseNotes>
+    <AssemblyVersion>1.1.1.0</AssemblyVersion>
+    <FileVersion>1.1.1.0</FileVersion>
+    <Version>1.1.1</Version>
+    <PackageReleaseNotes>1. Listing the Debug/Release mode of the discovered assemblies
+2. Assembly names in the test header</PackageReleaseNotes>
     <Company />
   </PropertyGroup>
 

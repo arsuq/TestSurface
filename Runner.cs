@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -124,7 +125,7 @@ namespace TestSurface
 
 						Print.Line();
 						var input = ownArgs != null && !runAll ? String.Join(" ", ownArgs) : "";
-						Print.AsTestHeader($"+{st.Name} {input}");
+						Print.AsTestHeader($"+{st.Name} [{st.Assembly.GetName().Name}] {input}");
 
 						if (testRec.ArgsMap.ContainsKey(INFO))
 						{
@@ -167,7 +168,10 @@ namespace TestSurface
 
 				runRec.Duration = DateTime.Now.Subtract(runStart);
 				Print.Line();
-				Print.AsSystemTrace("{0,-33}", $"RUN #{runIdx} RESULTS");
+				Print.trace("{0,-33}", 0, false,
+					Print.BackgroundSystemTrace,
+					Print.ForegroundSystemTrace,
+					$"RUN #{runIdx} RESULTS");
 				runRec.PrintStats();
 				Print.Line();
 
@@ -225,10 +229,10 @@ namespace TestSurface
 			var t = typeof(Runner);
 			var v = t.Assembly.GetName().Version;
 			var vs = $"v{v.Major}.{v.Minor}.{v.Build}";
-			var libs = SurfaceTypes.Select(x => x.Value.Assembly.FullName).Distinct().ToArray();
+			var libs = SurfaceTypes.Select(x => x.Value.Assembly).Distinct().ToArray();
 			const string pad60 = "{0,-70}";
 			Print.Line();
-			Print.trace(pad60, 0, false, Print.BackgroundSystemTrace, Print.ForegroundSystemTrace, "TEST SURFACE LAUNCHER " + vs);
+			Print.trace(pad60, 0, false, Print.BackgroundSystemTrace, Print.ForegroundSystemTrace, "SURFACE LAUNCHER " + vs);
 			Print.AsSystemTrace(pad60, "  Switches: ");
 			Print.AsSystemTrace(pad60, "  +all: activates all tests ");
 			Print.AsSystemTrace(pad60, "  +TestSurfaceClassName: launches one test only ");
@@ -240,7 +244,16 @@ namespace TestSurface
 			Print.Line();
 			$"Tests found: {SurfaceTypes.Count}".AsSystemTrace();
 			$"Assemblies: {libs.Length}".AsSystemTrace();
-			if (libs != null) foreach (var a in libs) a.trace(2, false, Print.Foreground, Print.Background);
+			if (libs != null && libs.Length > 0)
+				foreach (var a in libs)
+				{
+					var isDebug = a.GetCustomAttributes(false)
+						.OfType<DebuggableAttribute>()
+						.Any(i => i.IsJITTrackingEnabled);
+
+					if (isDebug) $"[D] {a.FullName}".trace(2, false, ConsoleColor.Gray, Print.Background);
+					else $"[R] {a.FullName}".trace(2, false, ConsoleColor.DarkGreen, Print.Background);
+				}
 			Print.Line();
 		}
 

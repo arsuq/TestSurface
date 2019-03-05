@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## v1.1.1
+
++ Listing the Debug/Release mode of the discovered assemblies
++ Assembly names in the test header
 
 ## v1.1
 
