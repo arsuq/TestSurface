@@ -2,6 +2,7 @@
 
 # Test Surface
 
+[![Build status](https://ci.appveyor.com/api/projects/status/744v953l9v35b05a?svg=true)](https://ci.appveyor.com/project/arsuq/files-5y6ur)
 > [v1.1 changelog](CHANGELOG.md)
 
 ## Description
