@@ -65,7 +65,8 @@ namespace TestSurface
 							var test = Activator.CreateInstance(t.Value) as ITestSurface;
 							if (test.IndependentLaunchOnly) { runRec.Skipped++; continue; }
 							run(test, t.Value);
-							if (breakOnFirstFailure && test.Passed.HasValue && !test.Passed.Value) break;
+							if (breakOnFirstFailure && ((!test.Passed.HasValue) ||
+								(test.Passed.HasValue && !test.Passed.Value))) break;
 						}
 						catch (Exception ex)
 						{
@@ -81,7 +82,8 @@ namespace TestSurface
 								var t = SurfaceTypes[k.Key];
 								var test = Activator.CreateInstance(t) as ITestSurface;
 								run(test, t);
-								if (breakOnFirstFailure && test.Passed.HasValue && !test.Passed.Value) break;
+								if (breakOnFirstFailure && ((!test.Passed.HasValue) ||
+									(test.Passed.HasValue && !test.Passed.Value))) break;
 							}
 							catch (Exception ex)
 							{

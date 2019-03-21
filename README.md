@@ -46,7 +46,7 @@ Values with no leading switch are added in a list with a "*" key. For example wi
   Launching with ```+all -info```  will trace all test descriptions.
 - with **+/-notrace** all *Print.AsInfo()* or *Print.Trace()* calls will be ignored. The +notrace is global for all tests.
 - **+noprint** disables all Print methods, including the test launcher status info. It's equivalent to ```Print.IgnoreAll = true```
-- **+brake** stops the launcher on the first failure
+- **+break** stops the launcher on the first failure
 - **-skip** followed by target names will ignore them if **+all** is present: ```+all -skip T1 T2```
 
  In code pass each argument as a separate string e.g.
