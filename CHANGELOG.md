@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## v1.1.2
+
++ The trace tries to lock with a Monitor now
++ The *LockAwaitMS* is infinite (-1) by default
++ *ThrowOnLockTimeout* is false, i.e. setting the *LockAwaitMS* to 10 for example,
+  will silently drop traces. The default setup will lag, but log everything.
+
 ## v1.1.1
 
 + Listing the Debug/Release mode of the discovered assemblies

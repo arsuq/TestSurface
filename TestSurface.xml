@@ -93,16 +93,16 @@
             Ignores all but the SystemTrace and the test header and status
             </summary>
         </member>
-        <member name="P:TestSurface.Print.LockAwaitMS">
+        <member name="F:TestSurface.Print.LockAwaitMS">
             <summary>
             Will bail tracing after waiting the specified timeout in milliseconds.
             If ThrowOnLockTimeout is true will throw a TimeoutException.
-            The default value is 100.
+            The default value is -1 (infinite).
             </summary>
         </member>
         <member name="F:TestSurface.Print.ThrowOnLockTimeout">
             <summary>
-            By default is true.
+            By default is false.
             </summary>
         </member>
         <member name="F:TestSurface.Print.SerializeTraces">

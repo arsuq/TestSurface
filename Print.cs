@@ -81,7 +81,7 @@ namespace TestSurface
 			var L = split ? text.Split(SPLIT_LINE, SplitOptions) : null;
 			var pass = false;
 
-			if (SerializeTraces) spinLock.TryEnter(lockAwaitMS, ref pass);
+			if (SerializeTraces) pass = Monitor.TryEnter(gate, LockAwaitMS);
 			else pass = true;
 
 			if (pass)
@@ -101,10 +101,10 @@ namespace TestSurface
 				Console.ForegroundColor = cc;
 				Console.BackgroundColor = bc;
 
-				if (SerializeTraces) spinLock.Exit();
+				if (SerializeTraces) Monitor.Exit(gate);
 			}
 			else if (ThrowOnLockTimeout)
-				throw new TimeoutException($"Failed to acquire the trace lock in {lockAwaitMS}ms.");
+				throw new TimeoutException($"Failed to acquire the trace lock in {LockAwaitMS}ms.");
 		}
 
 		/// <summary>
@@ -131,33 +131,20 @@ namespace TestSurface
 		/// <summary>
 		/// Will bail tracing after waiting the specified timeout in milliseconds.
 		/// If ThrowOnLockTimeout is true will throw a TimeoutException.
-		/// The default value is 100.
+		/// The default value is -1 (infinite).
 		/// </summary>
-		public static int LockAwaitMS
-		{
-			get => lockAwaitMS;
-			set
-			{
-				// Even 100 is too much
-				if (value < 0 || value > 200)
-					throw new ArgumentOutOfRangeException("LockAwaitMS", "Set SerializeTraces to false and use a kernel level lock!");
-
-				lockAwaitMS = value;
-			}
-		}
-		static int lockAwaitMS = 100;
+		public static int LockAwaitMS = -1;
 
 		/// <summary>
-		/// By default is true.
+		/// By default is false.
 		/// </summary>
-		public static bool ThrowOnLockTimeout = true;
+		public static bool ThrowOnLockTimeout = false;
 
 		/// <summary>
 		/// If there is no threading involved set to false.
 		/// Starts as true.
 		/// </summary>
 		public static bool SerializeTraces = true;
-
 
 		public static ConsoleColor ForegroundHelp = ConsoleColor.DarkCyan;
 		public static ConsoleColor ForegroundSuccess = ConsoleColor.Green;
@@ -180,6 +167,6 @@ namespace TestSurface
 		public static ConsoleColor Foreground = ConsoleColor.White;
 		public static ConsoleColor Background = ConsoleColor.Black;
 
-		static SpinLock spinLock = new SpinLock();
+		public static object gate = new object();
 	}
 }
