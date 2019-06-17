@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 
 namespace TestSurface
@@ -8,55 +9,53 @@ namespace TestSurface
 		static Print()
 		{
 			Foreground = Console.ForegroundColor;
-			Background = Console.BackgroundColor;
 		}
 
 		public static void Line() { if (!IgnoreAll) Console.WriteLine(); }
 
 		public static void AsHelp(this string text, params object[] formatArgs) =>
-			trace(text, 0, false, ForegroundHelp, Background, formatArgs);
+			trace(text, 0, false, Help, formatArgs);
 
 		public static void AsSystemTrace(this string text, params object[] formatArgs) =>
-			trace(text, 0, false, ForegroundSystemTrace, BackgroundSystemTrace, formatArgs);
+			trace(text, 0, false, SystemTrace, formatArgs);
 
 		public static void AsTestSuccess(this string text, params object[] formatArgs) =>
-			trace(text, 0, false, ForegroundTestSuccess, BackgroundTestSuccess, formatArgs);
+			trace(text, 0, false, TestSuccess, formatArgs);
 
 		public static void AsTestInfo(this string text, params object[] formatArgs) =>
-			Trace(text, 0, false, ForegroundTestInfo, BackgroundTestInfo, formatArgs);
+			Trace(text, 0, false, TestInfo, formatArgs);
 
 		public static void AsTestFailure(this string text, params object[] formatArgs) =>
-			trace(text, 0, false, ForegroundTestFailure, BackgroundTestFailure, formatArgs);
+			trace(text, 0, false, TestFailure, formatArgs);
 
 		public static void AsTestUnknown(this string text, params object[] formatArgs) =>
-			trace(text, 0, false, ForegroundTestUnknown, BackgroundTestUnknown, formatArgs);
+			trace(text, 0, false, TestUnknown, formatArgs);
 
 		public static void AsTestHeader(this string text, params object[] formatArgs) =>
-			trace(text, 0, false, ForegroundTestHeader, BackgroundTestHeader, formatArgs);
+			trace(text, 0, false, TestHeader, formatArgs);
 
 		public static void AsInfo(this string text, ConsoleColor c, params object[] formatArgs) =>
-			Trace(text, 2, false, c, Background, formatArgs);
+			Trace(text, 2, false, c, formatArgs);
 
-		public static void AsInfo(this string text, int leftMargin, bool split, ConsoleColor c, params object[] formatArgs) =>
-			Trace(text, leftMargin, split, c, Background, formatArgs);
+		public static void AsInfo(this string text, int leftMargin, bool split, ConsoleColor c, params object[] formatArgs) => Trace(text, leftMargin, split, c, formatArgs);
 
 		public static void AsInfo(this string text, params object[] formatArgs) =>
-			Trace(text, 2, false, Foreground, Background, formatArgs);
+			Trace(text, 2, false, Foreground, formatArgs);
 
 		public static void AsSuccess(this string text, params object[] formatArgs) =>
-			Trace(text, 2, false, ForegroundSuccess, Background, formatArgs);
+			Trace(text, 2, false, Success, formatArgs);
 
 		public static void AsInnerInfo(this string text, params object[] formatArgs) =>
-			Trace(text, 4, false, Foreground, Background, formatArgs);
+			Trace(text, 4, false, Foreground, formatArgs);
 
 		public static void AsError(this string text, params object[] formatArgs) =>
-			Trace(text, 2, false, ForegroundError, Background, formatArgs);
+			Trace(text, 2, false, Error, formatArgs);
 
 		public static void AsWarn(this string text, params object[] formatArgs) =>
-			Trace(text, 2, false, ForegroundWarn, Background, formatArgs);
+			Trace(text, 2, false, Warn, formatArgs);
 
 		public static void Trace(this string text, ConsoleColor c, params object[] formatArgs) =>
-			Trace(text, 2, false, c, Background, formatArgs);
+			Trace(text, 2, false, c, formatArgs);
 
 		/// <summary>
 		/// Traces the text if both IgnoreInfo and IgnoreAll are false.
@@ -65,16 +64,15 @@ namespace TestSurface
 		/// <param name="leftMargin">Number of chars to pad each line.</param>
 		/// <param name="split">Splits the text into multiple lines and adds the margin.</param>
 		/// <param name="c">The trace foreground color.</param>
-		/// <param name="bg">The trace background color. </param>
 		/// <param name="formatArgs">The standard string format arguments.</param>
-		public static void Trace(this string text, int leftMargin, bool split, ConsoleColor c, ConsoleColor bg, params object[] formatArgs)
+		public static void Trace(this string text, int leftMargin, bool split, ConsoleColor c, params object[] formatArgs)
 		{
 			if (IgnoreInfo) return;
 
-			trace(text, leftMargin, split, c, bg, formatArgs);
+			trace(text, leftMargin, split, c, formatArgs);
 		}
 
-		internal static void trace(this string text, int leftMargin, bool split, ConsoleColor c, ConsoleColor bg, params object[] formatArgs)
+		internal static void trace(this string text, int leftMargin, bool split, ConsoleColor c, params object[] formatArgs)
 		{
 			if (IgnoreAll) return;
 
@@ -87,9 +85,8 @@ namespace TestSurface
 			if (pass)
 			{
 				var cc = Console.ForegroundColor;
-				var bc = Console.BackgroundColor;
 				Console.ForegroundColor = c;
-				Console.BackgroundColor = bg;
+
 				Console.SetCursorPosition(leftMargin, Console.CursorTop);
 				if (L != null)
 					foreach (var line in L)
@@ -98,8 +95,8 @@ namespace TestSurface
 						Console.WriteLine(line, formatArgs);
 					}
 				else Console.WriteLine(text, formatArgs);
+
 				Console.ForegroundColor = cc;
-				Console.BackgroundColor = bc;
 
 				if (SerializeTraces) Monitor.Exit(gate);
 			}
@@ -146,26 +143,25 @@ namespace TestSurface
 		/// </summary>
 		public static bool SerializeTraces = true;
 
-		public static ConsoleColor ForegroundHelp = ConsoleColor.DarkCyan;
-		public static ConsoleColor ForegroundSuccess = ConsoleColor.Green;
-		public static ConsoleColor ForegroundError = ConsoleColor.Red;
-		public static ConsoleColor ForegroundWarn = ConsoleColor.Yellow;
+		public static void SetForegroudColor(ConsoleColor fc)
+		{
+			Foreground = fc;
+			Console.ForegroundColor = Foreground;
+		}
 
-		public static ConsoleColor ForegroundSystemTrace = ConsoleColor.White;
-		public static ConsoleColor BackgroundSystemTrace = ConsoleColor.DarkBlue;
-		public static ConsoleColor ForegroundTestSuccess = ConsoleColor.White;
-		public static ConsoleColor BackgroundTestSuccess = ConsoleColor.DarkGreen;
-		public static ConsoleColor ForegroundTestInfo = ConsoleColor.Yellow;
-		public static ConsoleColor BackgroundTestInfo = ConsoleColor.Black;
-		public static ConsoleColor ForegroundTestFailure = ConsoleColor.White;
-		public static ConsoleColor BackgroundTestFailure = ConsoleColor.DarkRed;
-		public static ConsoleColor ForegroundTestUnknown = ConsoleColor.White;
-		public static ConsoleColor BackgroundTestUnknown = ConsoleColor.DarkMagenta;
-		public static ConsoleColor ForegroundTestHeader = ConsoleColor.Black;
-		public static ConsoleColor BackgroundTestHeader = ConsoleColor.White;
+		public static ConsoleColor Help = ConsoleColor.DarkYellow;
+		public static ConsoleColor Success = ConsoleColor.DarkGreen;
+		public static ConsoleColor Error = ConsoleColor.DarkRed;
+		public static ConsoleColor Warn = ConsoleColor.Yellow;
+
+		public static ConsoleColor SystemTrace = ConsoleColor.Cyan;
+		public static ConsoleColor TestSuccess = ConsoleColor.Green;
+		public static ConsoleColor TestInfo = ConsoleColor.Yellow;
+		public static ConsoleColor TestFailure = ConsoleColor.Red;
+		public static ConsoleColor TestUnknown = ConsoleColor.DarkMagenta;
+		public static ConsoleColor TestHeader = ConsoleColor.Blue;
 
 		public static ConsoleColor Foreground = ConsoleColor.White;
-		public static ConsoleColor Background = ConsoleColor.Black;
 
 		public static object gate = new object();
 	}

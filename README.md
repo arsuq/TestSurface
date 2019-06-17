@@ -1,9 +1,8 @@
-﻿![](https://raw.githubusercontent.com/arsuq/TestSurface/master/Launcher.png)
-
+﻿
 # Test Surface
 
 [![Build status](https://ci.appveyor.com/api/projects/status/744v953l9v35b05a?svg=true)](https://ci.appveyor.com/project/arsuq/files-5y6ur)
-> [v1.1.3 changelog](CHANGELOG.md)
+> [v1.1.4 changelog](CHANGELOG.md)
 
 ## Description
 

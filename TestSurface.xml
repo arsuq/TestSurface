@@ -61,7 +61,7 @@
             <param name="args">The parsed arguments dictionary where the keys are switches.</param>
             <returns>A task to be awaited.</returns>
         </member>
-        <member name="M:TestSurface.Print.Trace(System.String,System.Int32,System.Boolean,System.ConsoleColor,System.ConsoleColor,System.Object[])">
+        <member name="M:TestSurface.Print.Trace(System.String,System.Int32,System.Boolean,System.ConsoleColor,System.Object[])">
             <summary>
             Traces the text if both IgnoreInfo and IgnoreAll are false.
             </summary>
@@ -69,7 +69,6 @@
             <param name="leftMargin">Number of chars to pad each line.</param>
             <param name="split">Splits the text into multiple lines and adds the margin.</param>
             <param name="c">The trace foreground color.</param>
-            <param name="bg">The trace background color. </param>
             <param name="formatArgs">The standard string format arguments.</param>
         </member>
         <member name="F:TestSurface.Print.SPLIT_LINE">

@@ -126,8 +126,13 @@ namespace TestSurface
 							(!runAll || testRec.ArgsMap[SKIP].IndexOf(st.Name) >= 0)) return;
 
 						Print.Line();
+						Print.Line();
 						var input = ownArgs != null && !runAll ? String.Join(" ", ownArgs) : "";
-						Print.AsTestHeader($"+{st.Name} [{st.Assembly.GetName().Name}] {input}");
+						var header = $"+{st.Name} [{st.Assembly.GetName().Name}] {input}";
+
+						Print.AsTestHeader(header);
+						Print.AsTestHeader(header.Length < LINE.Length ? LINE.Substring(0, header.Length - 1) : LINE);
+						Print.Line();
 
 						if (testRec.ArgsMap.ContainsKey(INFO))
 						{
@@ -146,6 +151,8 @@ namespace TestSurface
 					runRec.Tests.Add(st, testRec);
 					var dur = testRec.Duration;
 					var durstr = string.Format("[{0}m {1}s {2}ms]", dur.Minutes, dur.Seconds, dur.Milliseconds);
+
+					Print.Line();
 
 					if (test.Passed.HasValue || testRec.Exception != null)
 					{
@@ -171,8 +178,7 @@ namespace TestSurface
 				runRec.Duration = DateTime.Now.Subtract(runStart);
 				Print.Line();
 				Print.trace("{0,-33}", 0, false,
-					Print.BackgroundSystemTrace,
-					Print.ForegroundSystemTrace,
+					Print.SystemTrace,
 					$"RUN #{runIdx} RESULTS");
 				runRec.PrintStats();
 				Print.Line();
@@ -234,7 +240,7 @@ namespace TestSurface
 			var libs = SurfaceTypes.Select(x => x.Value.Assembly).Distinct().ToArray();
 			const string pad60 = "{0,-70}";
 			Print.Line();
-			Print.trace(pad60, 0, false, Print.BackgroundSystemTrace, Print.ForegroundSystemTrace, "SURFACE LAUNCHER " + vs);
+			Print.trace(pad60, 0, false, Print.SystemTrace, "SURFACE LAUNCHER " + vs);
 			Print.AsSystemTrace(pad60, "  Switches: ");
 			Print.AsSystemTrace(pad60, "  +all: activates all tests ");
 			Print.AsSystemTrace(pad60, "  +TestSurfaceClassName: launches one test only ");
@@ -253,8 +259,8 @@ namespace TestSurface
 						.OfType<DebuggableAttribute>()
 						.Any(i => i.IsJITTrackingEnabled);
 
-					if (isDebug) $"[D] {a.FullName}".trace(2, false, ConsoleColor.Gray, Print.Background);
-					else $"[R] {a.FullName}".trace(2, false, ConsoleColor.DarkGreen, Print.Background);
+					if (isDebug) $"[D] {a.FullName}".trace(2, false, ConsoleColor.Gray);
+					else $"[R] {a.FullName}".trace(2, false, ConsoleColor.DarkGreen);
 				}
 			Print.Line();
 		}
@@ -269,6 +275,10 @@ namespace TestSurface
 		public readonly string INFO = SUB_ARG_SWITCH + "info";
 		public readonly string SKIP = SUB_ARG_SWITCH + "skip";
 		public readonly string NO_PRINT = ARG_SWITCH + "noprint";
+
+		public string LINE =
+			"-----------------------------------------------------------------------------";
+
 
 		int isRuning;
 	}
