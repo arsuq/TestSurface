@@ -13,13 +13,16 @@
     <Win32Resource />
     <PackageIconUrl>https://raw.githubusercontent.com/arsuq/TestSurface/master/TestSurface.png</PackageIconUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/arsuq/TestSurface/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl></PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/arsuq/TestSurface.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/arsuq/TestSurface</RepositoryUrl>
-    <AssemblyVersion>1.1.4.0</AssemblyVersion>
-    <FileVersion>1.1.4.0</FileVersion>
-    <Version>1.1.4</Version>
-    <PackageReleaseNotes>Removed all background colors in Print.</PackageReleaseNotes>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
+    <Version>1.2</Version>
+    <PackageReleaseNotes>Tags. With +all -wtags tag1, tag2 one can easily start groups of tests.
+The Runner is renamed to SurfaceLauncher, the Run methods in both the Launcher and the ITestSurface interface are renamed to Start.
+@TheUpgraders, apologies for the renaming inconvenience.</PackageReleaseNotes>
     <Company />
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

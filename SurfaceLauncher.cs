@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 using System.Threading;
 
 namespace TestSurface
@@ -10,9 +10,9 @@ namespace TestSurface
 	/// <summary>
 	/// The ITestSurface launcher.
 	/// </summary>
-	public class Runner
+	public class SurfaceLauncher
 	{
-		public Runner()
+		public SurfaceLauncher()
 		{
 			RunHistory = new List<RunRecord>();
 			SurfaceTypes = AppDomain.CurrentDomain
@@ -28,11 +28,11 @@ namespace TestSurface
 		/// Starts all discoverable tests. 
 		/// </summary>
 		/// <remarks>
-		/// Only one Run execution at a time is allowed.
+		/// Only one Start execution at a time is allowed.
 		/// </remarks>
-		/// <exception cref="System.InvalidOperationException">If another Run is still executing.</exception>
+		/// <exception cref="System.InvalidOperationException">If another Start is still executing.</exception>
 		/// <param name="args">The arguments list</param>
-		public void Run(params string[] args)
+		public void Start(params string[] args)
 		{
 			if (Interlocked.CompareExchange(ref isRuning, 1, 0) > 0) throw new InvalidOperationException("Tests are running");
 
@@ -43,6 +43,14 @@ namespace TestSurface
 				var runIdx = RunHistory.Count + 1;
 				var runRec = new RunRecord(runIdx, args);
 				var argsMap = ArgsParser.Parse(DEF_OPTION_KEY, ARG_SWITCH, args);
+				var cmdMode = argsMap.ContainsKey(CMD);
+
+				if (cmdMode)
+				{
+					cmd(argsMap);
+					return;
+				}
+
 				var runAll = argsMap.ContainsKey(ALL);
 				var breakOnFirstFailure = argsMap.ContainsKey(BREAK);
 				var globalNoTrace = argsMap.ContainsKey(GLOBAL_NOTRACE);
@@ -59,11 +67,38 @@ namespace TestSurface
 				Print.Line();
 
 				if (runAll)
+				{
+					var allArgs = ArgsParser.Parse(DEF_OPTION_KEY, SUB_ARG_SWITCH, argsMap[ALL].ToArray());
+
+					HashSet<string> wtags = null;
+					HashSet<string> wotags = null;
+					HashSet<string> wxtags = null;
+
+					if (allArgs.ContainsKey(WITH_TAGS))
+						wtags = new HashSet<string>(allArgs[WITH_TAGS]);
+					else if (allArgs.ContainsKey(WITHOUT_TAGS))
+						wotags = new HashSet<string>(allArgs[WITHOUT_TAGS]);
+					else if (allArgs.ContainsKey(WITH_EXACT_TAGS))
+						wxtags = new HashSet<string>(allArgs[WITH_EXACT_TAGS]);
+
+					var tagQry = (wtags != null || wotags != null || wxtags != null);
+
 					foreach (var t in SurfaceTypes)
 						try
 						{
 							var test = Activator.CreateInstance(t.Value) as ITestSurface;
+
+							if (tagQry)
+							{
+								var tags = getTags(test);
+
+								if (tags == null || wtags != null && wtags.Intersect(tags).Count() < 1) continue;
+								if (wotags != null && tags != null && wotags.Intersect(tags).Count() > 0) continue;
+								if (tags == null || wxtags != null && wxtags.Intersect(tags).Count() != wxtags.Count) continue;
+							}
+
 							if (test.IndependentLaunchOnly) { runRec.Skipped++; continue; }
+
 							run(test, t.Value);
 							if (breakOnFirstFailure && ((!test.Passed.HasValue) ||
 								(test.Passed.HasValue && !test.Passed.Value))) break;
@@ -74,6 +109,7 @@ namespace TestSurface
 							Print.AsError(ex.ToString());
 							if (breakOnFirstFailure) break;
 						}
+				}
 				else
 					foreach (var k in argsMap)
 						if ((k.Key[0] == ARG_SWITCH) && SurfaceTypes.ContainsKey(k.Key))
@@ -131,17 +167,24 @@ namespace TestSurface
 						var header = $"+{st.Name} [{st.Assembly.GetName().Name}] {input}";
 
 						Print.AsTestHeader(header);
-						Print.AsTestHeader(header.Length < LINE.Length ? LINE.Substring(0, header.Length - 1) : LINE);
-						Print.Line();
+						Print.AsTestHeader("".PadRight(header.Length, '-'));
 
-						if (testRec.ArgsMap.ContainsKey(INFO))
+						var info = testRec.ArgsMap.ContainsKey(INFO);
+
+						if (PrintTestInfo || info)
 						{
-							Print.AsHelp(test.Info);
-							Print.Line();
-							infoTraces++;
-							return;
+							if (!string.IsNullOrEmpty(test.Tags)) $" # {test.Tags}".Trace(0, false, Print.Tag);
+							$" {test.Info}".AsTestInfo();
+
+							if (info)
+							{
+								infoTraces++;
+								return;
+							}
 						}
-						else test.Run(testRec.ArgsMap).Wait();
+
+						Print.Line();
+						test.Start(testRec.ArgsMap).Wait();
 					}
 					catch (Exception ex) { testRec.Exception = ex; }
 					finally { testRec.Duration = DateTime.Now.Subtract(started); }
@@ -184,7 +227,7 @@ namespace TestSurface
 				Print.Line();
 
 				if (runRec.Launched < 1 && infoTraces < 1 && args != null && args.Length > 0)
-					"Nothing to launch, check the arguments.".AsWarn();
+					"Nothing to launch.".AsWarn();
 			}
 			finally { Interlocked.Exchange(ref isRuning, 0); }
 		}
@@ -232,9 +275,62 @@ namespace TestSurface
 		/// </summary>
 		public Dictionary<string, Type> SurfaceTypes { get; private set; }
 
+		void cmd(Dictionary<string, List<string>> argsMap)
+		{
+			$"SURFACE LAUNCHER (command mode)".AsSystemTrace();
+			Print.Line();
+
+			var cmdArgs = ArgsParser.Parse(DEF_OPTION_KEY, SUB_ARG_SWITCH, argsMap[CMD].ToArray());
+
+			if (cmdArgs.ContainsKey(CMD_TAG_STATS)) tagStats();
+			else "No matching command.".AsWarn();
+
+			Print.Line();
+		}
+
+		void tagStats()
+		{
+			"Tag stats".Trace(Print.Command);
+
+			var tagsMap = new Dictionary<string, int>();
+
+			foreach (var t in SurfaceTypes)
+			{
+				var test = Activator.CreateInstance(t.Value) as ITestSurface;
+				var tags = getTags(test);
+
+				if (tags != null)
+					foreach (var tag in tags)
+						if (tagsMap.ContainsKey(tag)) tagsMap[tag]++;
+						else tagsMap.Add(tag, 1);
+			}
+
+			Print.Line();
+
+			foreach (var tk in tagsMap.OrderByDescending(x => x.Value))
+				$"{tk.Key} ({tk.Value})".AsInfo();
+
+			Print.Line();
+		}
+
+		string[] getTags(ITestSurface test)
+		{
+			string[] tags = null;
+
+			if (!string.IsNullOrWhiteSpace(test.Tags))
+			{
+				tags = test.Tags.Split(COMMA, StringSplitOptions.RemoveEmptyEntries);
+
+				for (int i = 0; i < tags.Length; i++)
+					tags[i] = tags[i].Trim();
+			}
+
+			return tags;
+		}
+
 		void printRunHeader()
 		{
-			var t = typeof(Runner);
+			var t = typeof(SurfaceLauncher);
 			var v = t.Assembly.GetName().Version;
 			var vs = $"v{v.Major}.{v.Minor}.{v.Build}";
 			var libs = SurfaceTypes.Select(x => x.Value.Assembly).Distinct().ToArray();
@@ -243,6 +339,9 @@ namespace TestSurface
 			Print.trace(pad60, 0, false, Print.SystemTrace, "SURFACE LAUNCHER " + vs);
 			Print.AsSystemTrace(pad60, "  Switches: ");
 			Print.AsSystemTrace(pad60, "  +all: activates all tests ");
+			Print.AsSystemTrace(pad60, "  +all -wtags  tag1 tag2: activates all tests having at least one tag match ");
+			Print.AsSystemTrace(pad60, "  +all -wotags tag1 tag2: activates all tests not having any of the specified tags");
+			Print.AsSystemTrace(pad60, "  +all -wxtags tag1 tag2: activates all tests having all of the specified tags");
 			Print.AsSystemTrace(pad60, "  +TestSurfaceClassName: launches one test only ");
 			Print.AsSystemTrace(pad60, "  +break: on first failure ");
 			Print.AsSystemTrace(pad60, "  -skip: ignores the specified tests (+all -skip T1 T2)");
@@ -265,9 +364,15 @@ namespace TestSurface
 			Print.Line();
 		}
 
+		/// <summary>
+		/// Prints the test info on Start().
+		/// </summary>
+		public bool PrintTestInfo { get; set; } = true;
+
 		public const string DEF_OPTION_KEY = "*";
 		public const char ARG_SWITCH = '+';
 		public const char SUB_ARG_SWITCH = '-';
+		public readonly string CMD = ARG_SWITCH + "cmd";
 		public readonly string ALL = ARG_SWITCH + "all";
 		public readonly string BREAK = ARG_SWITCH + "break";
 		public readonly string GLOBAL_NOTRACE = ARG_SWITCH + "notrace";
@@ -275,9 +380,12 @@ namespace TestSurface
 		public readonly string INFO = SUB_ARG_SWITCH + "info";
 		public readonly string SKIP = SUB_ARG_SWITCH + "skip";
 		public readonly string NO_PRINT = ARG_SWITCH + "noprint";
+		public readonly string WITH_TAGS = SUB_ARG_SWITCH + "wtags";
+		public readonly string WITHOUT_TAGS = SUB_ARG_SWITCH + "wotags";
+		public readonly string WITH_EXACT_TAGS = SUB_ARG_SWITCH + "wxtags";
+		public readonly string CMD_TAG_STATS = SUB_ARG_SWITCH + "tagstats";
+		readonly string[] COMMA = new string[] { "," };
 
-		public string LINE =
-			"-----------------------------------------------------------------------------";
 
 
 		int isRuning;

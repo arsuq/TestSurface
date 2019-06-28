@@ -33,6 +33,11 @@
             Description of the test and the arguments.
             </summary>
         </member>
+        <member name="P:TestSurface.ITestSurface.Tags">
+            <summary>
+            Comma-separated tags for launching groups of tests.
+            </summary>
+        </member>
         <member name="P:TestSurface.ITestSurface.FailureMessage">
             <summary>
             Set if the test fails.
@@ -54,7 +59,7 @@
             of the test application to be running at the same time.
             </summary>
         </member>
-        <member name="M:TestSurface.ITestSurface.Run(System.Collections.Generic.IDictionary{System.String,System.Collections.Generic.List{System.String}})">
+        <member name="M:TestSurface.ITestSurface.Start(System.Collections.Generic.IDictionary{System.String,System.Collections.Generic.List{System.String}})">
             <summary>
             If launched, the runner will wait for it to complete.
             </summary>
@@ -110,44 +115,9 @@
             Starts as true.
             </summary>
         </member>
-        <member name="T:TestSurface.Runner">
-            <summary>
-            The ITestSurface launcher.
-            </summary>
-        </member>
-        <member name="M:TestSurface.Runner.Run(System.String[])">
-            <summary>
-            Starts all discoverable tests. 
-            </summary>
-            <remarks>
-            Only one Run execution at a time is allowed.
-            </remarks>
-            <exception cref="T:System.InvalidOperationException">If another Run is still executing.</exception>
-            <param name="args">The arguments list</param>
-        </member>
-        <member name="M:TestSurface.Runner.GetTotalStats">
-            <summary>
-            Aggregates all counters.
-            </summary>
-        </member>
-        <member name="M:TestSurface.Runner.PrintTotalStats">
-            <summary>
-            Prints the aggregated counters for all runs.
-            </summary>
-        </member>
-        <member name="P:TestSurface.Runner.RunHistory">
-            <summary>
-            The test runs history in order.
-            </summary>
-        </member>
-        <member name="P:TestSurface.Runner.SurfaceTypes">
-            <summary>
-            All discovered ITestSurface implementations
-            </summary>
-        </member>
         <member name="T:TestSurface.RunRecordStats">
             <summary>
-            The basic Run counters. When returned from GetTotalStats()
+            The basic Start counters. When returned from GetTotalStats()
             the values are aggregated from all runs.
             </summary>
         </member>
@@ -194,6 +164,46 @@
         <member name="P:TestSurface.SurfaceRunRecord.Duration">
             <summary>
             The running time.
+            </summary>
+        </member>
+        <member name="T:TestSurface.SurfaceLauncher">
+            <summary>
+            The ITestSurface launcher.
+            </summary>
+        </member>
+        <member name="M:TestSurface.SurfaceLauncher.Start(System.String[])">
+            <summary>
+            Starts all discoverable tests. 
+            </summary>
+            <remarks>
+            Only one Start execution at a time is allowed.
+            </remarks>
+            <exception cref="T:System.InvalidOperationException">If another Start is still executing.</exception>
+            <param name="args">The arguments list</param>
+        </member>
+        <member name="M:TestSurface.SurfaceLauncher.GetTotalStats">
+            <summary>
+            Aggregates all counters.
+            </summary>
+        </member>
+        <member name="M:TestSurface.SurfaceLauncher.PrintTotalStats">
+            <summary>
+            Prints the aggregated counters for all runs.
+            </summary>
+        </member>
+        <member name="P:TestSurface.SurfaceLauncher.RunHistory">
+            <summary>
+            The test runs history in order.
+            </summary>
+        </member>
+        <member name="P:TestSurface.SurfaceLauncher.SurfaceTypes">
+            <summary>
+            All discovered ITestSurface implementations
+            </summary>
+        </member>
+        <member name="P:TestSurface.SurfaceLauncher.PrintTestInfo">
+            <summary>
+            Prints the test info on Start().
             </summary>
         </member>
     </members>

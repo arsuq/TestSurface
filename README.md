@@ -4,55 +4,101 @@
 # Test Surface
 
 [![Build status](https://ci.appveyor.com/api/projects/status/744v953l9v35b05a?svg=true)](https://ci.appveyor.com/project/arsuq/files-5y6ur)
-> [v1.1.4 changelog](CHANGELOG.md)
+> [v1.2 changelog](CHANGELOG.md)
 
 ## Description
 
-The lib defines a testing contract, provides a command line arguments parser, a simple printing utility
-and a test runner. In order to use the runner one has to implement the ITestSurface interface:
+The lib defines a test contract, provides a command line arguments parser, a simple printing utility, 
+a recursive object comparer and a test launcher. 
 
 ```csharp
 public interface ITestSurface
 {
-	string Info { get; }
-	string FailureMessage { get; }
-	bool? Passed { get; }
-	bool IsComplete { get; }
-	bool IndependentLaunchOnly { get; }
-	Task Run(ArgMap args);
+    string Info { get; }   // The test description
+    string Tags { get; }   // A comma-separated list of tags 
+    string FailureMessage { get; }
+    bool? Passed { get; }  
+    bool IsComplete { get; }   // Useful for multi-method tests
+    bool IndependentLaunchOnly { get; }  // If true, the test can't be started with +all
+    Task Start(ArgMap args);
 }
 ``` 
 
-The runner can be launched in two modes:
+The launcher can be started in two modes:
 
 - with specific *ITestSurface* implementations: ``` +ITestSurfaceImplName -options o1 o2 +ITestSurfaceImplName2```
-- with **+all** to discover and activate all compatible types. Tests having *IndependentLaunchOnly = true* will be 
+- with the **+all** switch to discover and activate all compatible types. Tests having *IndependentLaunchOnly = true* will be 
   ignored when *+all* is present.
 
 > Note: All implementations must have a default constructor.
 
 ### Arguments
 
-Each test is provided with its subset of the original arguments or with a map with *"+all"* key.
+Each test is provided with its own subset of the original arguments or with a map with *"+all"* key.
 The map keys are the switches with the prefix (e.g. +all, -option) and the values are the arguments following the switch.
 Values with no leading switch are added in a list with a "*" key. For example with
-``` runner.Run("+TS","nolead", "-leadOption", "value") ``` the test will receive a map with two keys
+``` launcher.Start("+TS","nolead", "-leadOption", "value") ``` the test will receive a map with two keys
 ```leadOption [value]``` and ```* [nolead] ```.  
 
+In code pass each argument as a separate string e.g.
+```launcher.Start("+TS1", "-option", "option with spaces", "o2", "+TS2"); ```
 
+### SurfaceLauncher options
 
-### Launcher options
-
-- including **-info** will take the Info property and trace it instead of executing the Run method.   
+- including **-info** will take the Info property and trace it instead of executing the Start method.   
   Launching with ```+all -info```  will trace all test descriptions.
 - with **+/-notrace** all *Print.AsInfo()* or *Print.Trace()* calls will be ignored. The +notrace is global for all tests.
 - **+noprint** disables all Print methods, including the test launcher status info. It's equivalent to ```Print.IgnoreAll = true```
 - **+break** stops the launcher on the first failure
 - **-skip** followed by target names will ignore them if **+all** is present: ```+all -skip T1 T2```
+- **-wtags** followed by a list of tags launches all tests having at least one matching tag
+- **-wotags** starts the tests which don't have any tag in common with the args
+- **-wxtags** starts the tests having all of the provided tags
 
- In code pass each argument as a separate string e.g.
-```runner.Run("+TS1", "-option", "option with spaces", "o2", "+TS2"); ```
+ Only one of the tag switches can be applied, and it must be as a sub-switch of *+all*: ```+all -wtags tag1 tag2 ```
+ 
+ To list the tests with their descriptions: ```+all -wtags tag1 tag2 -info```
 
+- **+cmd** with a sub-option executes a command
+ 
+ For example ``` +cmd -tagstats``` prints the tags and the number of tests they are declared in 
+
+
+### Assert
+
+The	```Assert.SameValues(object , object b, BindingFlags bf) ``` compares two objects by-value 
+in depth using reflection. This is useful for template comparison, i.e. setting up an object tree as
+a passing condition and comparing it with a runner instance at the end of the test. If no BindingFlags
+are provided only the public members are observed. 
+
+> Note that collections and enumerations are compared recursively for each item.
+
+The types are reflected once and kept in a static cache, which can be cleared with ````Assert.ClearTypeCache()````.
+
+```csharp
+public Task Start(IDictionary<string, List<string>> args)
+{
+    var model = new
+    {
+        thisMustBeTrue = false,
+        thisSquenceIsSuperImportant = new double[] { 1.012, 0.001, 3.912 },
+        innerObj = new { text = "whatever" }
+    };
+
+    var comp = new
+    {
+        thisMustBeTrue = false,
+        thisSquenceIsSuperImportant = new double[] { 1.0212, 0.001, 3.912 },
+        innerObj = new { text = "whatever" }
+    };
+
+    // Test...
+
+    Passed = Assert.SameValues(model, comp);
+
+    return Task.CompletedTask;
+}
+```
 
 ### Print 
 
@@ -69,21 +115,21 @@ one should set ```Print.SerializeTraces = false``` and apply external synchroniz
 
 ### Records
 
-The Runner keeps records of the activated test types, their input arguments and unhandled exceptions.
-One could inspect a specific test instance from the ```SurfaceRunRecord``` instance:
+The SurfaceLauncher keeps records of the activated test types, their input arguments and unhandled exceptions.
+One could inspect a specific test from the ```SurfaceRunRecord``` instance:
 
 ```csharp
-var r = new Runner();
+var r = new SurfaceLauncher();
 
-r.Run(args1);
-r.Run(args2);
+r.Start(args1);
+r.Start(args2);
 
 var rr = r.RunHistory[runIndex];     // The RunRecord has the run stats
 var sr = rr.Tests[testType];         // A SurfaceRunRecord
 var test = (TheTestType)sr.Instance; // The activated test
 
 // sr.ArgsMap is a reference to the input map
-// sr.Exception is not handled or re-thrown by the test.Run
+// sr.Exception is either unhandled or re-thrown by the test.Start
 
 var ts = run.GetTotalStats(); // Aggregates all stats   
 
@@ -100,15 +146,13 @@ Add a reference to the TestRunner.dll and implement the ITestSurface interface:
 public class XYZSurface : ITestSurface
 {
     public string Info => "Test description...";
+    public string Tags => "tag1, tag2";
     public string FailureMessage { get; private set; }
     public bool? Passed { get; private set; }
     public bool IndependentLaunchOnly => false;
     public bool IsComplete { get; private set; }
 	
-    // Add members
-    public KnownException KnownEx { get; private set; }  	
-
-    public async Task Run(Dictionary<string, List<string>> args)
+    public async Task Start(Dictionary<string, List<string>> args)
     {
         try
         {
@@ -129,7 +173,6 @@ public class XYZSurface : ITestSurface
         }
         catch(KnownException x)
         {
-            KnownEx = x;
             Passed = false;
             FailureMessage = x.Message;
         }
@@ -143,7 +186,7 @@ public class XYZSurface : ITestSurface
 ```
 
 
-Launch a new Runner instance:
+Launch a new SurfaceLauncher instance:
 
 
 ```csharp
@@ -156,16 +199,16 @@ namespace Tests
     {
         static int Main(string[] args)
         {
-            var r = new Runner();
+            var l = new SurfaceLauncher();
            
             // (1) Relay the terminal
             // The args should contain +all or +ITestSurfaceTypeName
-            r.Run(args);
+            l.Start(args);
 
             // (2) Or launch specific tests from code
             // Pass each argument as a separate string to preserve spaces 
-            r.Run("+TS1", "-option", "with space", "o2", "+TS2");
-            r.Run("+TS1", "-option", "o3", "o4");
+            l.Start("+TS1", "-option", "with space", "o2", "+TS2");
+            l.Start("+TS1", "-option", "o3", "o4");
             
             // Check the Results
             var rs = r.GetTotalStats();

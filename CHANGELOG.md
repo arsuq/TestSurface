@@ -1,5 +1,16 @@
 ﻿# Changelog
 
+## v1.2
+
++ **Tags**. With ```+all -wtags tag1 tag2``` one can easily start groups of tests.
++ The *ITestSurface* has a Tags property.
++ The **Runner** is renamed to **SurfaceLauncher**.
++ The **Run** methods in both the *Launcher* and the *ITestSurface* interface are renamed to **Start**.
++ A command mode for the launcher with the **+cmd** -commandName switch
++ The launcher has a *PrintTestInfo* flag which controls the printing of the Info text after the test header. 
+
+> @TheUpgraders, apologies for the renaming inconvenience.
+
 
 ## v1.1.4
 

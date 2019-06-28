@@ -160,6 +160,8 @@ namespace TestSurface
 		public static ConsoleColor TestFailure = ConsoleColor.Red;
 		public static ConsoleColor TestUnknown = ConsoleColor.DarkMagenta;
 		public static ConsoleColor TestHeader = ConsoleColor.Blue;
+		public static ConsoleColor Tag = ConsoleColor.DarkGray;
+		public static ConsoleColor Command = ConsoleColor.Magenta;
 
 		public static ConsoleColor Foreground = ConsoleColor.White;
 

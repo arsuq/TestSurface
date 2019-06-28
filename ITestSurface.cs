@@ -13,6 +13,11 @@ namespace TestSurface
 		string Info { get; }
 
 		/// <summary>
+		/// Comma-separated tags for launching groups of tests.
+		/// </summary>
+		string Tags { get; }
+
+		/// <summary>
 		/// Set if the test fails.
 		/// </summary>
 		string FailureMessage { get; }
@@ -38,6 +43,6 @@ namespace TestSurface
 		/// </summary>
 		/// <param name="args">The parsed arguments dictionary where the keys are switches.</param>
 		/// <returns>A task to be awaited.</returns>
-		Task Run(ArgMap args);
+		Task Start(ArgMap args);
 	}
 }

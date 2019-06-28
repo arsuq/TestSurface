@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace TestSurface
 {
 	/// <summary>
-	/// The basic Run counters. When returned from GetTotalStats()
+	/// The basic Start counters. When returned from GetTotalStats()
 	/// the values are aggregated from all runs.
 	/// </summary>
 	public class RunRecordStats
