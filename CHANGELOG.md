@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## v1.3 
+
++ Upgraded to .NET standard 2.1
+
 ## v1.2
 
 + **Tags**. With ```+all -wtags tag1 tag2``` one can easily start groups of tests.

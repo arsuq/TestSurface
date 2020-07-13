@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <Platforms>AnyCPU;x64</Platforms>
     <Authors>Arsuq</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Flat learning curve test runner. The lib (.NET Standard) has a single interface, an argument parser, a printing utility and a launcher.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Copyright>Copyright (c) 2019 Arsuq</Copyright>
+    <Copyright>Copyright (c) 2020 Arsuq</Copyright>
     <PackageTags>test</PackageTags>
     <ApplicationIcon />
     <Win32Resource />
@@ -15,12 +15,10 @@
     <PackageLicenseUrl>https://raw.githubusercontent.com/arsuq/TestSurface/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/arsuq/TestSurface.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/arsuq/TestSurface</RepositoryUrl>
-    <AssemblyVersion>1.2.0.0</AssemblyVersion>
-    <FileVersion>1.2.0.0</FileVersion>
-    <Version>1.2</Version>
-    <PackageReleaseNotes>Tags. With +all -wtags tag1, tag2 one can easily start groups of tests.
-The Runner is renamed to SurfaceLauncher, the Run methods in both the Launcher and the ITestSurface interface are renamed to Start.
-@TheUpgraders, apologies for the renaming inconvenience.</PackageReleaseNotes>
+    <AssemblyVersion>1.3.0.0</AssemblyVersion>
+    <FileVersion>1.3.0.0</FileVersion>
+    <Version>1.3</Version>
+    <PackageReleaseNotes>Upgraded to .NET standard 2.1</PackageReleaseNotes>
     <Company />
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
