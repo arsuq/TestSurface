@@ -8,19 +8,21 @@
     <Description>Flat learning curve test runner. The lib has a single interface, an argument parser, a printing utility and a launcher.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Copyright>Copyright (c) 2025 Arsuq</Copyright>
-    <PackageTags>test</PackageTags>
+    <PackageTags>test;testing;test-runner;framework</PackageTags>
     <ApplicationIcon />
     <Win32Resource />
-    <PackageIconUrl>https://raw.githubusercontent.com/arsuq/TestSurface/master/TestSurface.png</PackageIconUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/arsuq/TestSurface/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/arsuq/TestSurface.git</PackageProjectUrl>
+    <!-- Modern package metadata -->
+    <PackageIcon>TestSurface.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/arsuq/TestSurface</PackageProjectUrl>
     <RepositoryUrl>https://github.com/arsuq/TestSurface</RepositoryUrl>
     <AssemblyVersion>1.3.1.0</AssemblyVersion>
     <FileVersion>1.3.1.0</FileVersion>
     <Version>1.31</Version>
-    <PackageReleaseNotes>.net core 8</PackageReleaseNotes>
+    <PackageReleaseNotes>.NET 8</PackageReleaseNotes>
     <Company />
     <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -38,5 +40,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DocumentationFile>C:\Github\TestSurface\TestSurface.xml</DocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="TestSurface.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>
