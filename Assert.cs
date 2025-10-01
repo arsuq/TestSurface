@@ -26,7 +26,14 @@ namespace TestSurface
 			if (t != b.GetType()) throw new ArgumentException("Type mismatch");
 
 			if ((t.IsPrimitive || t.IsValueType)) return a.Equals(b);
+			if (t == typeof(string)) return a.Equals(b);
 			if (typeof(IComparable).IsAssignableFrom(t)) return ((IComparable)a).CompareTo(b) == 0;
+
+			// Handle collections directly as sequences (except strings which we handled above)
+			if (typeof(IEnumerable).IsAssignableFrom(t) && t != typeof(string))
+			{
+				return sameSeq(a, b, bf, visited);
+			}
 
 			var av = visited.Contains(a);
 			var bv = visited.Contains(b);
@@ -86,19 +93,31 @@ namespace TestSurface
 
 		static bool sameSeq(object ao, object bo, BindingFlags? bf, HashSet<object> visited)
 		{
+			if (ao == null) return bo == null;
+			if (bo == null) return false;
+
 			var ae = ((IEnumerable)ao).GetEnumerator();
 			var be = ((IEnumerable)bo).GetEnumerator();
-			var ar = ae.MoveNext();
-			var br = be.MoveNext();
 
-			while (ar && br)
+			try
 			{
-				if (!SameValues(ae.Current, be.Current, bf, visited)) return false;
-				ar = ae.MoveNext();
-				br = be.MoveNext();
-			}
+				var ar = ae.MoveNext();
+				var br = be.MoveNext();
 
-			return (!ar && !br);
+				while (ar && br)
+				{
+					if (!SameValues(ae.Current, be.Current, bf, visited)) return false;
+					ar = ae.MoveNext();
+					br = be.MoveNext();
+				}
+
+				return (!ar && !br);
+			}
+			finally
+			{
+				(ae as IDisposable)?.Dispose();
+				(be as IDisposable)?.Dispose();
+			}
 		}
 
 		static readonly ConcurrentDictionary<Type, FieldInfo[]> fields = new ConcurrentDictionary<Type, FieldInfo[]>();
