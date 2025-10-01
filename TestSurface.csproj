@@ -5,9 +5,9 @@
     <Platforms>AnyCPU;x64</Platforms>
     <Authors>Arsuq</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>Flat learning curve test runner. The lib (.NET Standard) has a single interface, an argument parser, a printing utility and a launcher.</Description>
+    <Description>Flat learning curve test runner. The lib has a single interface, an argument parser, a printing utility and a launcher.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Copyright>Copyright (c) 2020 Arsuq</Copyright>
+    <Copyright>Copyright (c) 2025 Arsuq</Copyright>
     <PackageTags>test</PackageTags>
     <ApplicationIcon />
     <Win32Resource />
@@ -15,10 +15,10 @@
     <PackageLicenseUrl>https://raw.githubusercontent.com/arsuq/TestSurface/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/arsuq/TestSurface.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/arsuq/TestSurface</RepositoryUrl>
-    <AssemblyVersion>1.3.0.0</AssemblyVersion>
-    <FileVersion>1.3.0.0</FileVersion>
+    <AssemblyVersion>1.3.1.0</AssemblyVersion>
+    <FileVersion>1.3.1.0</FileVersion>
     <Version>1.31</Version>
-    <PackageReleaseNotes>Upgraded to .NET standard 2.1</PackageReleaseNotes>
+    <PackageReleaseNotes>.net core 8</PackageReleaseNotes>
     <Company />
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
