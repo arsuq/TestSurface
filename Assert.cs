@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace TestSurface
 {
@@ -25,15 +26,13 @@ namespace TestSurface
 			var t = a.GetType();
 			if (t != b.GetType()) throw new ArgumentException("Type mismatch");
 
+			// Basic ints, floats, bools, etc.
 			if (t.IsPrimitive) return a.Equals(b);
+			// Value types like DateTime, TimeSpan, Guid, decimal, enums
+			if (t.IsValueType && !IsReferenceOrContainsReferences(t)) return a.Equals(b);
 			if (t == typeof(string)) return a.Equals(b);
-			//if (typeof(IComparable).IsAssignableFrom(t)) return ((IComparable)a).CompareTo(b) == 0;
-
 			// Handle collections directly as sequences (except strings which we handled above)
-			if (typeof(IEnumerable).IsAssignableFrom(t) && t != typeof(string))
-			{
-				return sameSeq(a, b, bf, visited);
-			}
+			if (typeof(IEnumerable).IsAssignableFrom(t) && t != typeof(string)) return sameSeq(a, b, bf, visited);
 
 			var av = visited.Contains(a);
 			var bv = visited.Contains(b);
@@ -52,17 +51,18 @@ namespace TestSurface
 			var F = fields[t];
 			var P = props[t];
 
-			foreach (var f in F)
-			{
-				var ao = f.GetValue(a);
-				var bo = f.GetValue(b);
-
-				if ((typeof(IEnumerable).IsAssignableFrom(f.FieldType)))
+			if (F != null && F.Length > 0)
+				foreach (var f in F)
 				{
-					if (!sameSeq(ao, bo, bf, visited)) return false;
+					var ao = f.GetValue(a);
+					var bo = f.GetValue(b);
+
+					if ((typeof(IEnumerable).IsAssignableFrom(f.FieldType)))
+					{
+						if (!sameSeq(ao, bo, bf, visited)) return false;
+					}
+					else if (!SameValues(ao, bo, bf, visited)) return false;
 				}
-				else if (!SameValues(ao, bo, bf, visited)) return false;
-			}
 
 			foreach (var p in P)
 			{
@@ -119,6 +119,24 @@ namespace TestSurface
 				(be as IDisposable)?.Dispose();
 			}
 		}
+
+		public static bool IsReferenceOrContainsReferences(Type t)
+		{
+			if (t == null) throw new ArgumentNullException(nameof(t));
+			if (t.ContainsGenericParameters)
+				throw new ArgumentException("Open generic type definitions are not supported.", nameof(t));
+
+			var method = isRefOrContainsRefsGeneric.MakeGenericMethod(t);
+			return (bool)method.Invoke(null, null);
+		}
+
+		// To use RuntimeHelpers.IsReferenceOrContainsReferences<T> which only exists as a generic method, 
+		// This will help us compare value types like datetime, decimal, timespan, guid with Equals instead of deep reflection
+		// Other value types with refs inside will be deeply reflected
+		static readonly MethodInfo isRefOrContainsRefsGeneric =
+		   typeof(RuntimeHelpers).GetMethod(nameof(RuntimeHelpers.IsReferenceOrContainsReferences),
+			   BindingFlags.Public | BindingFlags.Static);
+
 
 		static readonly ConcurrentDictionary<Type, FieldInfo[]> fields = new ConcurrentDictionary<Type, FieldInfo[]>();
 		static readonly ConcurrentDictionary<Type, PropertyInfo[]> props = new ConcurrentDictionary<Type, PropertyInfo[]>();
