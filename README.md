@@ -1,224 +1,327 @@
-﻿
-![](TestSurface.png)
+﻿![](TestSurface.png)
 
 # Test Surface
 
 [![.NET](https://github.com/arsuq/TestSurface/actions/workflows/dotnet.yml/badge.svg)](https://github.com/arsuq/TestSurface/actions/workflows/dotnet.yml)
 
-## Description
+> **Simple testing framework with one interface, deep object comparison, and command-line control.**
 
-The lib defines a test contract, provides a command line arguments parser, a simple printing utility, 
-a recursive object comparer and a test launcher. 
+## 🎯 Why TestSurface Exists
+
+If you're reading this, chances are you've experienced one (or all) of these frustrations:
+
+- **⚙️ Setup Paralysis**: Spending hours configuring test frameworks instead of writing tests
+- **🏷️ Attribute Hell**: Decorating every method with `[Test]`, `[Fact]`, `[TestMethod]`, `[Setup]`, `[TearDown]`...
+- **🎭 Magic Dependencies**: Your tests break because some invisible framework magic changed
+- **🔧 Integration Nightmares**: Different test types require different runners, different configurations
+
+**TestSurface was born from a simple belief: Testing should amplify your productivity, not drain it.**
+
+## 📋 The Core Interface
+
+TestSurface revolves around one simple interface - implement it and you're ready to test!
 
 ```csharp
 public interface ITestSurface
 {
-    string Info { get; }   // The test description
-    string Tags { get; }   // A comma-separated list of tags 
-    string FailureMessage { get; }
-    bool? Passed { get; }  
-    bool IsComplete { get; }   // Useful for multi-method tests
-    bool IndependentLaunchOnly { get; }  // If true, the test can't be started with +all
-    Task Start(ArgMap args);
+    string Info { get; }                    // The test description
+    string Tags { get; }                    // A comma-separated list of tags 
+    string FailureMessage { get; }          // Error details when failed
+    bool? Passed { get; }                   // null=unknown, true/false=result
+    bool IsComplete { get; }                // Useful for multi-method tests
+    bool IndependentLaunchOnly { get; }     // If true, the test can't be started with +all
+    Task Start(ArgMap args);                // Test execution
 }
 ``` 
 
-The launcher can be started in two modes:
+### 🎯 Implementation Example
 
-- with specific *ITestSurface* implementations: ``` +ITestSurfaceImplName -options o1 o2 +ITestSurfaceImplName2```
-- with the **+all** switch to discover and activate all compatible types. Tests having *IndependentLaunchOnly = true* will be 
-  ignored when *+all* is present.
+Clean, compact implementation that fits on one screen:
 
-> Note: All implementations must have a default constructor.
+```csharp
+public class OrderTest : ITestSurface
+{
+    public string Info => "Tests order processing validation";
+    public string Tags => "order, validation";
+    public string FailureMessage { get; private set; }
+    public bool? Passed { get; private set; }
+    public bool IsComplete { get; private set; }
+    public bool IndependentLaunchOnly => false;
 
-### Arguments
+    public async Task Start(Dictionary<string, List<string>> args)
+    {
+        try
+        {
+            // Process test data
+            var result = await ProcessOrder();
+            
+            // Expected order structure - deep comparison demo
+            var expected = new
+            {
+                orderId = 1001,
+                customer = new { id = 501, name = "John Doe" },
+                items = new[] 
+                {
+                    new { id = 1, name = "Product A", price = 29.99, quantity = 2 },
+                    new { id = 2, name = "Product B", price = 15.50, quantity = 1 }
+                },
+                total = 75.48,
+                status = "completed"
+            };
 
-Each test is provided with its own subset of the original arguments or with a map with *"+all"* key.
-The map keys are the switches with the prefix (e.g. +all, -option) and the values are the arguments following the switch.
-Values with no leading switch are added in a list with a "*" key. For example with
-``` launcher.Start("+TS","nolead", "-leadOption", "value") ``` the test will receive a map with two keys
-```leadOption [value]``` and ```* [nolead] ```.  
+            // One line compares entire structure - no manual checks needed!
+            Passed = Assert.SameValues(expected, result);
+            IsComplete = true;
+        }
+        catch (Exception ex)
+        {
+            Passed = false;
+            FailureMessage = $"Test failed: {ex.Message}";
+        }
+    }
+    
+    private async Task<object> ProcessOrder()
+    {
+        // your code
+    }
+}
+```
 
-In code pass each argument as a separate string e.g.
-```launcher.Start("+TS1", "-option", "option with spaces", "o2", "+TS2"); ```
+## 🚀 Quick Start
 
-### SurfaceLauncher options
+### Two Launch Modes - Total Flexibility
 
-- including **-info** will take the Info property and trace it instead of executing the Start method.   
-  Launching with ```+all -info```  will trace all test descriptions.
-- with **+/-notrace** all *Print.AsInfo()* or *Print.Trace()* calls will be ignored. The +notrace is global for all tests.
-- **+noprint** disables all Print methods, including the test launcher status info. It's equivalent to ```Print.IgnoreAll = true```
-- **+break** stops the launcher on the first failure
-- **-skip** followed by target names will ignore them if **+all** is present: ```+all -skip T1 T2```
-- **-wtags** followed by a list of tags launches all tests having at least one matching tag
-- **-wotags** starts the tests which don't have any tag in common with the args
-- **-wxtags** starts the tests having all of the provided tags
+1. **🎯 Targeted Testing**: Run specific tests by name
+   ```bash
+   +MyAwesomeTest -iterations 100 +AnotherTest -timeout 5000
+   ```
 
- Only one of the tag switches can be applied, and it must be as a sub-switch of *+all*: ```+all -wtags tag1 tag2 ```
- 
- To list the tests with their descriptions: ```+all -wtags tag1 tag2 -info```
+2. **🌐 Comprehensive Testing**: Discover and run ALL compatible tests
+   ```bash
+   +all -wtags performance,integration
+   ```
 
-- **+cmd** with a sub-option executes a command
- 
- For example ``` +cmd -tagstats``` prints the tags and the number of tests they are declared in 
+> 📝 **Pro Tip**: All test implementations must have a default constructor - keeping things simple!
 
+### 📋 Command Arguments Made Simple
 
-### Assert
+TestSurface's argument parsing is intuitive and powerful. Here's how it works:
 
-The	```Assert.SameValues(object , object b, BindingFlags bf) ``` compares two objects by-value 
-in depth using reflection. This is useful for template comparison, i.e. setting up an object tree as
-a passing condition and comparing it with a runner instance at the end of the test. If no BindingFlags
-are provided only the public members are observed. 
+| Argument Pattern | Result | Example |
+|------------------|--------|---------|
+| `+switch` | Test selector | `+MyTest` launches MyTest |
+| `-option value` | Option with value | `-timeout 5000` sets timeout |
+| `value` (no prefix) | Default arguments | `defaultValue` goes to `*` key |
+| `+all` | Run all tests | Discovers all ITestSurface types |
 
-> Note that collections and enumerations are compared recursively for each item.
+**Example in action:**
+```csharp
+// This command:
+launcher.Start("+TS", "nolead", "-leadOption", "value");
 
-The types are reflected once and kept in a static cache, which can be cleared with ````Assert.ClearTypeCache()````.
+// Creates this argument map for the test:
+// leadOption → ["value"]
+// * → ["nolead"]
+```
+
+### 🎛️ Launcher Options - Power When You Need It
+
+TestSurface gives you fine-grained control over test execution:
+
+| Option | Description | Example |
+|--------|-------------|---------|
+| `-info` | Show test info instead of running | `+all -info` shows all test descriptions |
+| `+/-notrace` | Enable/disable Print.Trace() output | Global trace control |
+| `+noprint` | Disable ALL printing | Equivalent to `Print.IgnoreAll = true` |
+| `+break` | Stop on first failure | Fail-fast behavior |
+| `-skip T1 T2` | Skip specific tests with +all | `+all -skip SlowTest FlakyTest` |
+| `-wtags tag1 tag2` | Run tests with ANY matching tag | Tag-based test selection |
+| `-wotags tag1 tag2` | Run tests with NO matching tags | Exclusion by tags |
+| `-wxtags tag1 tag2` | Run tests with ALL matching tags | Strict tag matching |
+| `+cmd -tagstats` | Show tag statistics | Great for test organization |
+
+**💡 Remember**: Tag options must be used with `+all` and only one tag option can be used at a time!
+
+### 🔍 Deep Object Comparison Made Easy
+
+**Stop writing tedious comparison code!** TestSurface's `Assert.SameValues()` does the heavy lifting for you with recursive, reflective object comparison.
+
+**Why you'll love it:**
+- 🎯 **Deep comparison**: Recursively compares entire object graphs
+- ⚡ **Performance optimized**: Type reflection cached for speed
+- 🔧 **Flexible**: Control comparison depth with BindingFlags
+- 📦 **Collection-aware**: Handles arrays, lists, and enumerables seamlessly
 
 ```csharp
 public Task Start(IDictionary<string, List<string>> args)
 {
-    var model = new
+    // Set up your expected result template
+    var expected = new
     {
-        thisMustBeTrue = false,
-        thisSquenceIsSuperImportant = new double[] { 1.012, 0.001, 3.912 },
-        innerObj = new { text = "whatever" }
+        success = true,
+        metrics = new double[] { 1.012, 0.001, 3.912 },
+        details = new { message = "Operation completed", code = 200 }
     };
 
-    var comp = new
-    {
-        thisMustBeTrue = false,
-        thisSquenceIsSuperImportant = new double[] { 1.0212, 0.001, 3.912 },
-        innerObj = new { text = "whatever" }
-    };
+    // Your test produces actual results
+    var actual = RunYourTestOperation();
 
-    // Test...
-
-    Passed = Assert.SameValues(model, comp);
+    // One line to compare everything - no manual property-by-property checks!
+    Passed = Assert.SameValues(expected, actual);
 
     return Task.CompletedTask;
 }
 ```
 
-### Print 
+> 🚀 **Pro Tip**: Clear the type cache with `Assert.ClearTypeCache()` if you need fresh reflection data!
 
-Use *Print* to trace info during the test instead of the Console directly for it can be suppressed
-with **-notrace** or **-noprint**. Additionally, all Print methods are synchronized for usage in multi-threaded code 
-if ```Print.SerializeTraces = true```, which is the default value. 
-When no printing is needed ```Print.IgnoreAll = false``` will disable it.
+### 📝 Smart Output Management
 
-**Note:**   
-Print will drop traces if awaits more than ```LockAwaitMS ``` and will throw a *TimeoutException* if 
-```Print.ThrowOnLockTimeout``` is enabled (false by default). If that behavior is not acceptable 
-one should set ```Print.SerializeTraces = false``` and apply external synchronization or use the Console directly.
+**Take control of your test output** without cluttering your code with conditional statements.
 
+**Key benefits:**
+- 🎛️ **Global control**: Suppress output with `-notrace` or `-noprint` flags
+- 🔒 **Thread-safe**: Built-in synchronization for multi-threaded tests
+- ⏱️ **Timeout-aware**: Configurable lock timeouts to prevent deadlocks
+- 🎯 **Selective**: Disable specific output types while keeping others
 
-### Records
+**⚠️ Performance Note**: For high-performance scenarios, set `Print.SerializeTraces = false` and manage synchronization externally.
 
-The SurfaceLauncher keeps records of the activated test types, their input arguments and unhandled exceptions.
-One could inspect a specific test from the ```SurfaceRunRecord``` instance:
+### 📊 Complete Test History
 
+**Never lose test context again!** TestSurface maintains detailed records of every test run.
+
+**Access comprehensive test data:**
 ```csharp
-var r = new SurfaceLauncher();
+var launcher = new SurfaceLauncher();
 
-r.Start(args1);
-r.Start(args2);
+// Run tests
+launcher.Start(args1);
+launcher.Start(args2);
 
-var rr = r.RunHistory[runIndex];     // The RunRecord has the run stats
-var sr = rr.Tests[testType];         // A SurfaceRunRecord
-var test = (TheTestType)sr.Instance; // The activated test
+// Dive into results
+var runRecord = launcher.RunHistory[0];          // Complete run statistics
+var testRecord = runRecord.Tests[typeof(MyTest)]; // Individual test details
+var testInstance = (MyTest)testRecord.Instance;   // The actual test instance
 
-// sr.ArgsMap is a reference to the input map
-// sr.Exception is either unhandled or re-thrown by the test.Start
+// Analyze everything:
+// - Original arguments (testRecord.ArgsMap)
+// - Exceptions (testRecord.Exception) 
+// - Test state and results
 
-var ts = run.GetTotalStats(); // Aggregates all stats   
-
+var overallStats = launcher.GetTotalStats();     // Aggregate all run data
 ```
 
+## 🚀 Launching Tests
 
+### From Command Line
 
+The most common way to launch tests - perfect for CI/CD and terminal usage:
 
-
-## Usage
-
-Add a reference to the TestRunner.dll and implement the ITestSurface interface:
 ```csharp
-public class XYZSurface : ITestSurface
+static int Main(string[] args)
 {
-    public string Info => "Test description...";
-    public string Tags => "tag1, tag2";
+    var launcher = new SurfaceLauncher();
+    
+    // Simply relay terminal arguments - TestSurface does the rest!
+    launcher.Start(args);
+    
+    // Return meaningful exit code based on results
+    var stats = launcher.GetTotalStats();
+    return stats.Failed > 0 ? -stats.Failed : 0;
+}
+```
+
+**Command line examples:**
+```bash
+# Run specific tests
+MyTestApp.exe +PerformanceTest -iterations 1000 +IntegrationTest -timeout 30000
+
+# Run all tests with specific tags
+MyTestApp.exe +all -wtags smoke,fast
+
+# Show test information without running
+MyTestApp.exe +all -info
+```
+
+### Programmatically
+
+Launch tests directly from code with full control:
+
+```csharp
+var launcher = new SurfaceLauncher();
+
+// Launch specific tests with precise arguments
+launcher.Start("+PerformanceTest", "-iterations", "1000", "-timeout", "30000");
+launcher.Start("+IntegrationTest", "-database", "testdb", "-users", "100");
+
+// Run the same test with different parameters
+launcher.Start("+LoadTest", "-concurrent", "10", "-duration", "60");
+launcher.Start("+LoadTest", "-concurrent", "50", "-duration", "120");
+
+// Get comprehensive results
+var overallStats = launcher.GetTotalStats();
+Console.WriteLine($"Total tests: {overallStats.Total}, Failed: {overallStats.Failed}");
+
+// Inspect individual test instances
+var testRecord = launcher.RunHistory[0].Tests[typeof(PerformanceTest)];
+var testInstance = (PerformanceTest)testRecord.Instance;
+Console.WriteLine($"Final result: {testInstance.Passed}");
+}
+```
+
+**AI Prompt for Test Generation:**
+```
+Generate a TestSurface test class that implements ITestSurface for [scenario].
+
+Requirements:
+- Set Info property to describe what the test does
+- Set Tags property with relevant comma-separated tags
+- In Start() method, set Passed = true/false based on test outcome
+- Set FailureMessage when Passed = false
+- Use Assert.SameValues() for complex object comparisons
+- Handle exceptions by setting Passed = false and FailureMessage = ex.Message
+- Use .AsSuccess(), .AsError(), .AsInfo() extension methods for output
+
+Example pattern:
+public class [TestName] : ITestSurface
+{
+    public string Info => "[Description]";
+    public string Tags => "[tags]";
     public string FailureMessage { get; private set; }
     public bool? Passed { get; private set; }
-    public bool IndependentLaunchOnly => false;
     public bool IsComplete { get; private set; }
-	
-    public async Task Start(Dictionary<string, List<string>> args)
+    public bool IndependentLaunchOnly => false;
+
+    public async Task Start(IDictionary<string, List<string>> args)
     {
         try
         {
-            // Add +all support  
-            if (args.ContainsKey("+all"))
-                args.Add("-param", new List<string>() { "10", "1000" });
-
-            // The common path, i.e. either +all or +XYZSurface
-            var P = args["-param"];
-
-            // Check for default values  
-            if (args.ContainsKey("*")){}
-
-            // Assert...
-			
-            if (!Passed.HasValue) Passed = true;
+            // Test implementation
+            Passed = [condition];
             IsComplete = true;
         }
-        catch(KnownException x)
+        catch (Exception ex)
         {
             Passed = false;
-            FailureMessage = x.Message;
-        }
-        catch(Exception ex)
-        {
-            // Not handling or re-throwing an exception will preserve it
-            // in the SurfaceRunRecord.Exception property.
+            FailureMessage = ex.Message;
         }
     }
 }
 ```
 
 
-Start new SurfaceLauncher instance:
+## 🎉 Get Started Today!
 
+TestSurface is designed to be simple, flexible, and powerful. Whether you're testing:
+- 🧪 Unit tests
+- 🔗 Integration tests
+- 🧭 End-to-end tests
+- 🎯 Performance tests
 
-```csharp
-using System;
-using TestSurface;
+TestSurface gives you the tools without the complexity. Start writing tests that matter, not configuring frameworks that don't.
 
-namespace Tests
-{
-    class Program
-    {
-        static int Main(string[] args)
-        {
-            var l = new SurfaceLauncher();
-           
-            // (1) Relay the terminal
-            // The args should contain +all or +ITestSurfaceTypeName
-            l.Start(args);
+---
 
-            // (2) Or launch specific tests from code
-            // Pass each argument as a separate string to preserve spaces 
-            l.Start("+TS1", "-option", "with space", "o2", "+TS2");
-            l.Start("+TS1", "-option", "o3", "o4");
-            
-            // Check the Results
-            var rs = r.GetTotalStats();
-			
-            // Inspect specific instance
-            var ts = (TS1)r.RunHistory[1].Tests[typeof(TS1)].Instance;
-			
-            // Get the total failures count
-            return rs.Failed > 0 ? -rs.Failed : 0;
-        }
-    }
-}
-```
+**Happy Testing! 🚀**
 
