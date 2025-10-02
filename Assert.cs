@@ -25,9 +25,9 @@ namespace TestSurface
 			var t = a.GetType();
 			if (t != b.GetType()) throw new ArgumentException("Type mismatch");
 
-			if ((t.IsPrimitive || t.IsValueType)) return a.Equals(b);
+			if (t.IsPrimitive) return a.Equals(b);
 			if (t == typeof(string)) return a.Equals(b);
-			if (typeof(IComparable).IsAssignableFrom(t)) return ((IComparable)a).CompareTo(b) == 0;
+			//if (typeof(IComparable).IsAssignableFrom(t)) return ((IComparable)a).CompareTo(b) == 0;
 
 			// Handle collections directly as sequences (except strings which we handled above)
 			if (typeof(IEnumerable).IsAssignableFrom(t) && t != typeof(string))
